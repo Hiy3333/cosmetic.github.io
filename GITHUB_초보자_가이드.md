@@ -62,37 +62,57 @@
 2. **"Windows PowerShell"** 또는 **"터미널"** 선택
 3. 또는 시작 메뉴에서 "PowerShell" 검색
 
-### 2-2. 전체 명령어 (복사해서 붙여넣기)
+### 2-2. 명령어 실행 (하나씩 복사해서 붙여넣기)
 
-**⚠️ 중요: 아래 명령어에서 `저장소URL` 부분만 실제 GitHub 저장소 URL로 변경하세요!**
+**⚠️ 중요: 아래 명령어를 하나씩 복사해서 붙여넣고 Enter를 누르세요!**
 
-PowerShell에 아래 명령어를 **전체 복사해서 붙여넣고 Enter**:
-
+**1단계: 프로젝트 폴더로 이동**
 ```powershell
 cd C:\Users\Hi\Desktop\sample_test
-git init
-git branch -M main
-git remote add origin 저장소URL
-git add .
-git commit -m "Initial commit"
-git push -u origin main
 ```
+→ 복사해서 붙여넣고 Enter
 
-**저장소URL 변경 방법:**
-- 1단계에서 복사한 URL 사용
-- 예: `https://github.com/Hiy3333/sample-test-app.git`
-- 위 명령어에서 `저장소URL` 부분을 이 URL로 바꾸세요
-
-**예시 (실제 사용할 때):**
+**2단계: Git 초기화**
 ```powershell
-cd C:\Users\Hi\Desktop\sample_test
 git init
+```
+→ 복사해서 붙여넣고 Enter
+
+**3단계: 브랜치 이름 설정**
+```powershell
 git branch -M main
-git remote add origin https://github.com/Hiy3333/sample-test-app.git
+```
+→ 복사해서 붙여넣고 Enter
+
+**4단계: 원격 저장소 연결**
+```powershell
+git remote add origin https://github.com/Hiy3333/저장소이름.git
+```
+→ `저장소이름`을 실제 저장소 이름으로 변경 후 복사해서 붙여넣고 Enter
+
+**⚠️ "remote origin already exists" 오류가 나면:**
+```powershell
+git remote remove origin
+```
+→ 먼저 실행하고, 그 다음 4단계 다시 실행
+
+**5단계: 모든 파일 추가**
+```powershell
 git add .
+```
+→ **점(.) 포함해서** 복사해서 붙여넣고 Enter
+
+**6단계: 커밋 (저장)**
+```powershell
 git commit -m "Initial commit"
+```
+→ 복사해서 붙여넣고 Enter
+
+**7단계: GitHub에 푸시 (업로드)**
+```powershell
 git push -u origin main
 ```
+→ 복사해서 붙여넣고 Enter
 
 **처음 푸시 시:**
 - GitHub 로그인 창이 뜰 수 있습니다
@@ -173,20 +193,32 @@ git push -u origin main
 
 코드를 수정한 후 다시 올리는 방법:
 
-### 7-1. 전체 명령어 (복사해서 붙여넣기)
+### 7-1. 명령어 실행 (하나씩 복사해서 붙여넣기)
 
-PowerShell에 아래 명령어를 **전체 복사해서 붙여넣고 Enter**:
-
+**1단계: 프로젝트 폴더로 이동**
 ```powershell
 cd C:\Users\Hi\Desktop\sample_test
+```
+→ 복사해서 붙여넣고 Enter
+
+**2단계: 모든 파일 추가**
+```powershell
 git add .
+```
+→ **점(.) 포함해서** 복사해서 붙여넣고 Enter
+
+**3단계: 커밋 (저장)**
+```powershell
 git commit -m "업데이트 내용"
+```
+→ `"업데이트 내용"`을 원하는 메시지로 변경 후 복사해서 붙여넣고 Enter
+- 예: `"버그 수정"`, `"새 기능 추가"`, `"디자인 개선"`
+
+**4단계: GitHub에 푸시**
+```powershell
 git push
 ```
-
-**커밋 메시지 변경:**
-- `"업데이트 내용"` 부분을 원하는 메시지로 변경
-- 예: `"버그 수정"`, `"새 기능 추가"`, `"디자인 개선"`
+→ 복사해서 붙여넣고 Enter
 
 ### 7-2. 자동 배포
 - `git push` 후 자동으로 GitHub Actions가 실행됩니다
@@ -205,13 +237,19 @@ git init
 ```
 
 ### "remote origin already exists" 오류
-**해결 (복사해서 붙여넣기, 저장소URL 변경 필요):**
+**해결 (하나씩 복사해서 붙여넣기):**
+
+**1단계: 기존 원격 저장소 제거**
 ```powershell
 git remote remove origin
-git remote add origin 저장소URL
 ```
+→ 복사해서 붙여넣고 Enter
 
-**저장소URL을 실제 URL로 변경하세요!**
+**2단계: 원격 저장소 다시 추가**
+```powershell
+git remote add origin https://github.com/Hiy3333/저장소이름.git
+```
+→ `저장소이름`을 실제 저장소 이름으로 변경 후 복사해서 붙여넣고 Enter
 
 ### "Permission denied" 오류
 **해결:**
