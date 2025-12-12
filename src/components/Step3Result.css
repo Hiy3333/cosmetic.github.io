@@ -1,0 +1,284 @@
+.step3-result {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.result-title {
+  color: #333;
+  font-size: 1.8rem;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.result-section {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 28px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+}
+
+.result-section:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.section-title {
+  color: #333;
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #667eea;
+}
+
+/* 기본 정보 */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.info-label {
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.info-value {
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* 점수 요약 */
+.score-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+.score-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+  padding: 28px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.15);
+  border: 2px solid transparent;
+  background-image: linear-gradient(white, white), linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  transition: all 0.3s;
+}
+
+.score-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25);
+}
+
+.score-label {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+
+.score-value {
+  color: #667eea;
+  font-weight: 700;
+}
+
+.score-value.large {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.score-max {
+  color: #999;
+  font-size: 0.9rem;
+  margin-top: 5px;
+}
+
+/* 상세 점수 */
+.detailed-scores {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.score-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #e0e0e0;
+  transition: all 0.3s;
+}
+
+.score-row.excellent {
+  border-left-color: #4caf50;
+}
+
+.score-row.good {
+  border-left-color: #8bc34a;
+}
+
+.score-row.average {
+  border-left-color: #ffc107;
+}
+
+.score-row.poor {
+  border-left-color: #f44336;
+}
+
+.score-item-name {
+  min-width: 150px;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.score-display {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.score-bar-container {
+  flex: 1;
+  height: 24px;
+  background: #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.score-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  transition: width 0.5s ease;
+}
+
+.score-row.excellent .score-bar {
+  background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+}
+
+.score-row.good .score-bar {
+  background: linear-gradient(90deg, #8bc34a 0%, #cddc39 100%);
+}
+
+.score-row.average .score-bar {
+  background: linear-gradient(90deg, #ffc107 0%, #ff9800 100%);
+}
+
+.score-row.poor .score-bar {
+  background: linear-gradient(90deg, #f44336 0%, #e91e63 100%);
+}
+
+.score-number {
+  min-width: 50px;
+  text-align: right;
+  font-weight: 700;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+/* 개선사항 */
+.improvement-content {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  color: #333;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  border: 1px solid #e0e0e0;
+}
+
+/* 버튼들 */
+.result-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.btn-excel,
+.btn-reset {
+  flex: 1;
+  padding: 16px 32px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-excel {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.btn-excel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.btn-excel:hover::before {
+  left: 100%;
+}
+
+.btn-excel:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(76, 175, 80, 0.5);
+}
+
+.btn-reset {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-reset::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.btn-reset:hover::before {
+  left: 100%;
+}
+
+.btn-reset:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.btn-excel:active,
+.btn-reset:active {
+  transform: translateY(-1px);
+}
+

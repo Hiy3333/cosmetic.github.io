@@ -1,0 +1,24 @@
+{
+  "name": "sample-test-app",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && echo 배포 준비 완료! dist 폴더의 모든 내용을 GitHub 저장소 루트에 올려주세요.",
+    "git:push": "powershell -ExecutionPolicy Bypass -File ./deploy.ps1"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.87.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8"
+  }
+}

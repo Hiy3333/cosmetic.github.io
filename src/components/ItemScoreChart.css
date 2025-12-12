@@ -1,0 +1,260 @@
+.item-score-chart {
+  padding: 20px;
+}
+
+.item-chart-empty {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+.item-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.item-chart-title {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.item-chart-stats {
+  display: flex;
+  gap: 20px;
+}
+
+.item-chart-stat {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.item-chart-stat strong {
+  color: #667eea;
+  font-weight: 700;
+}
+
+.item-chart-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+  min-height: 360px;
+  padding: 20px 0;
+}
+
+.item-chart-bars-container {
+  flex: 1;
+  overflow-x: auto;
+}
+
+.item-chart-bars {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  height: 320px;
+  padding-bottom: 50px;
+  min-width: 100%;
+  overflow: visible;
+}
+
+.item-chart-bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 60px;
+}
+
+.item-chart-bar-container {
+  height: 320px;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  justify-content: center;
+  overflow: visible;
+  position: relative;
+  padding-top: 30px;
+  box-sizing: border-box;
+}
+
+.item-chart-bar {
+  width: 100%;
+  max-width: 50px;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 5px;
+  min-height: 20px;
+}
+
+.item-chart-bar:hover {
+  opacity: 0.8;
+  transform: scaleY(1.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.item-chart-bar-value {
+  font-size: 0.85rem;
+  color: white;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.item-chart-bar-label {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #666;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.item-chart-x-axis-label {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.item-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+}
+
+.item-chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.item-chart-legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.item-chart-legend-label {
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.item-chart-bars-group {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 100%;
+  gap: 2px;
+}
+
+.item-chart-bars-horizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  gap: 10px;
+  padding-bottom: 5px;
+}
+
+.item-chart-manufacturer-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.item-chart-usage-bars-group {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.item-chart-bar-horizontal-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.item-chart-bar-grouped {
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 8px;
+  min-height: 20px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.item-chart-bar-grouped:hover {
+  opacity: 0.8;
+  transform: scaleY(1.05);
+}
+
+.item-chart-bar-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  font-size: 0.7rem;
+}
+
+.item-chart-bar-usage {
+  color: #667eea;
+  font-weight: 600;
+}
+
+.item-chart-bar-score-text {
+  color: #333;
+  font-weight: 600;
+}
+
+.item-chart-bar-manufacturer-name {
+  font-size: 0.75rem;
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  text-align: center;
+  width: 100%;
+  z-index: 10;
+}
+
+.item-chart-bar-empty {
+  width: 100%;
+  max-width: 50px;
+  height: 0;
+  border: 1px dashed #ddd;
+  border-radius: 8px;
+}
+
