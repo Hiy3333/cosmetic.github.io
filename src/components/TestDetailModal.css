@@ -707,3 +707,259 @@
   font-weight: 600;
 }
 
+/* 모바일 반응형 스타일 */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .modal-content {
+    width: 100vw;
+    max-width: 100vw;
+    height: 90vh;
+    max-height: 90vh;
+    border-radius: 20px 20px 0 0;
+    margin: 0;
+  }
+
+  .modal-header {
+    padding: 15px 20px;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 100;
+    border-bottom: 2px solid #e0e0e0;
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+  }
+
+  .modal-close-btn {
+    font-size: 1.3rem;
+    padding: 8px 12px;
+  }
+
+  .modal-body {
+    padding: 20px 15px;
+  }
+
+  .modal-section {
+    margin-bottom: 25px;
+  }
+
+  .modal-section-title {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  }
+
+  .modal-info-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .modal-info-label {
+    font-size: 0.85rem;
+  }
+
+  .modal-info-value {
+    font-size: 0.95rem;
+  }
+
+  .modal-score-summary {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .modal-score-value {
+    font-size: 1.3rem;
+  }
+
+  .modal-score-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 15px;
+  }
+
+  .modal-score-item-name {
+    min-width: auto;
+    width: 100%;
+    font-size: 0.9rem;
+  }
+
+  .modal-score-display {
+    width: 100%;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .modal-score-bar-container {
+    width: 100%;
+    height: 20px;
+  }
+
+  .modal-score-number {
+    min-width: auto;
+    text-align: left;
+    font-size: 0.95rem;
+  }
+
+  .modal-improvement {
+    padding: 12px;
+    font-size: 0.9rem;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px 20px;
+    position: sticky;
+    bottom: 0;
+    background: white;
+    z-index: 100;
+    border-top: 2px solid #e0e0e0;
+  }
+
+  .modal-full-download-button,
+  .modal-download-button,
+  .modal-close-button,
+  .modal-delete-button {
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 0.95rem;
+  }
+
+  .modal-authors-container {
+    flex-direction: column;
+    gap: 15px;
+    overflow-x: visible;
+  }
+
+  .modal-author-section {
+    min-width: auto;
+    width: 100%;
+    max-width: 100%;
+    padding: 15px;
+  }
+
+  .modal-author-title {
+    font-size: 1.1rem;
+  }
+
+  .modal-scores-chart-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-score-item-row {
+    min-height: 200px;
+    height: 200px;
+    padding: 8px;
+    padding-top: 40px;
+    padding-bottom: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .modal-score-item-name {
+    min-width: auto;
+    width: 100%;
+    padding: 5px;
+    padding-bottom: 10px;
+    padding-top: 0;
+    height: auto;
+    font-size: 0.85rem;
+    text-align: left;
+  }
+
+  .modal-score-bars-row {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 5px;
+  }
+
+  .modal-manufacturer-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    min-height: auto;
+    height: auto;
+  }
+
+  .modal-score-item-name-header {
+    min-width: auto;
+    width: 100%;
+    font-size: 0.85rem;
+    padding: 5px;
+  }
+
+  .modal-manufacturer-labels-row {
+    width: 100%;
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 8px;
+    padding-top: 5px;
+  }
+
+  .modal-manufacturer-header-group {
+    min-width: 80px;
+  }
+
+  .modal-manufacturer-label-header {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+    min-height: 20px;
+  }
+
+  .modal-manufacturer-group {
+    min-width: 80px;
+  }
+
+  .modal-manufacturer-label-above {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+    min-height: 20px;
+  }
+
+  .modal-usage-bars-group {
+    gap: 4px;
+  }
+
+  .modal-score-bar-vertical {
+    min-width: 30px;
+  }
+
+  .modal-score-bar-value {
+    font-size: 0.7rem;
+  }
+
+  .modal-score-bar-info {
+    font-size: 0.65rem;
+  }
+
+  .usage-scores-table {
+    font-size: 0.85rem;
+  }
+
+  .usage-scores-table th,
+  .test-item-cell,
+  .usage-score-cell {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+
+  .test-item-column {
+    min-width: 120px;
+  }
+
+  .usage-column {
+    min-width: 80px;
+  }
+}
+
