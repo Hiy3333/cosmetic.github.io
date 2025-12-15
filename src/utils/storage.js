@@ -21,24 +21,34 @@ export const saveTestData = async (formData) => {
     console.log('저장할 날짜 (정규화):', testDate)
     
     // 중복 체크: 같은 날짜, 시간대, 작성자, 제조사, 샘플 넘버, 회차의 테스트가 이미 있는지 확인
-    const { data: existingTests, error: checkError } = await supabase
-      .from('tests')
-      .select('*')
-      .eq('date', testDate)
-      .eq('author', formData.author)
-      .eq('manufacturer', formData.manufacturer)
-      .eq('sample_number', formData.sampleNumber)
-      .eq('usage_count', formData.usageCount)
-      .eq('time_slot', timeSlot)
-    
-    if (checkError) {
-      console.error('중복 체크 실패:', checkError)
-      // 에러가 나도 계속 진행 (중복 체크 실패는 치명적이지 않음)
+    let existingTests = []
+    try {
+      const { data, error: checkError } = await supabase
+        .from('tests')
+        .select('*')
+        .eq('date', testDate)
+        .eq('author', formData.author)
+        .eq('manufacturer', formData.manufacturer)
+        .eq('sample_number', formData.sampleNumber)
+        .eq('usage_count', formData.usageCount)
+        .eq('time_slot', timeSlot)
+      
+      if (checkError) {
+        console.error('중복 체크 실패:', checkError)
+        // 에러가 나도 계속 진행 (중복 체크 실패는 치명적이지 않음)
+        existingTests = []
+      } else {
+        existingTests = data || []
+      }
+    } catch (error) {
+      console.error('중복 체크 중 예외 발생:', error)
+      // 예외가 발생해도 계속 진행
+      existingTests = []
     }
     
     // 중복이면 저장하지 않음
     if (existingTests && existingTests.length > 0) {
-      console.log('중복된 테스트 데이터가 있어 저장하지 않습니다.')
+      console.log('중복된 테스트 데이터가 있어 저장하지 않습니다. 기존 데이터:', existingTests)
       return null
     }
     
@@ -51,28 +61,36 @@ export const saveTestData = async (formData) => {
       : 0
     
     // Supabase에 저장
+    const insertData = {
+      date: testDate,
+      time_slot: timeSlot,
+      manufacturer: formData.manufacturer,
+      sample_number: formData.sampleNumber,
+      author: formData.author,
+      usage_count: formData.usageCount,
+      skin_type: formData.skinType,
+      scores: scores,
+      improvement: formData.improvement || '',
+      total_score: totalScore,
+      average_score: parseFloat(averageScore)
+    }
+    
+    console.log('저장할 데이터:', insertData)
+    
     const { data, error } = await supabase
       .from('tests')
-      .insert([
-        {
-          date: testDate,
-          time_slot: timeSlot,
-          manufacturer: formData.manufacturer,
-          sample_number: formData.sampleNumber,
-          author: formData.author,
-          usage_count: formData.usageCount,
-          skin_type: formData.skinType,
-          scores: scores,
-          improvement: formData.improvement || '',
-          total_score: totalScore,
-          average_score: parseFloat(averageScore)
-        }
-      ])
+      .insert([insertData])
       .select()
       .single()
     
     if (error) {
       console.error('데이터 저장 실패:', error)
+      console.error('에러 상세:', JSON.stringify(error, null, 2))
+      return null
+    }
+    
+    if (!data) {
+      console.error('데이터 저장 실패: 반환된 데이터가 없습니다.')
       return null
     }
     
