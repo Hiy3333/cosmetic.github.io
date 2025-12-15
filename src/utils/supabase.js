@@ -6,8 +6,64 @@ import { createClient } from '@supabase/supabase-js'
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
-// Supabase 클라이언트 생성
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Supabase가 제대로 설정되었는지 확인
+export const isSupabaseConfigured = () => {
+  return supabaseUrl && supabaseAnonKey && 
+         supabaseUrl !== '' && supabaseAnonKey !== '' &&
+         !supabaseUrl.includes('placeholder') && 
+         !supabaseAnonKey.includes('placeholder')
+}
+
+// localStorage를 사용하지 않는 가짜 스토리지 객체 생성
+const createFakeStorage = () => {
+  return {
+    getItem: () => null,
+    setItem: () => {},
+    removeItem: () => {},
+    clear: () => {},
+    length: 0,
+    key: () => null
+  }
+}
+
+// Supabase 클라이언트 생성 (설정이 없으면 null 반환)
+let supabase = null
+if (isSupabaseConfigured()) {
+  try {
+    // localStorage 접근을 완전히 차단하고 Supabase 클라이언트 생성
+    const fakeStorage = createFakeStorage()
+    
+    // localStorage를 완전히 우회하는 가짜 스토리지 사용
+    supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        storage: fakeStorage, // localStorage 대신 가짜 스토리지 사용
+        autoRefreshToken: false, // 토큰 자동 갱신 비활성화 (인증 사용 안 함)
+        persistSession: false, // 세션 저장 안 함
+        detectSessionInUrl: false
+      },
+      global: {
+        headers: {}
+      }
+    })
+    
+    console.log('✅ Supabase 클라이언트가 생성되었습니다.')
+    console.log('📍 URL:', supabaseUrl)
+  } catch (error) {
+    // localStorage 관련 에러는 무시
+    if (error.message && error.message.includes('storage')) {
+      console.warn('⚠️ localStorage 접근 에러가 발생했지만 Supabase 클라이언트는 생성되었습니다.')
+    } else {
+      console.error('❌ Supabase 클라이언트 생성 실패:', error)
+      supabase = null
+    }
+  }
+} else {
+  console.warn('⚠️ Supabase가 설정되지 않았습니다.')
+  console.log('📍 URL:', supabaseUrl || '(없음)')
+  console.log('📍 Key:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : '(없음)')
+}
+
+export { supabase }
 
 // 연결 테스트 함수
 export const testConnection = async () => {

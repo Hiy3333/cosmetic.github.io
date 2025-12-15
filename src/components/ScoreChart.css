@@ -1,1 +1,244 @@
+.score-chart {
+  padding: 20px;
+}
+
+.chart-empty {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+.chart-week-navigation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  padding: 10px;
+}
+
+.chart-nav-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.chart-nav-button:hover:not(:disabled) {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+}
+
+.chart-nav-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.chart-week-info {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  min-width: 200px;
+  text-align: center;
+}
+
+.chart-container {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+  min-height: 360px;
+  padding: 20px 0;
+}
+
+.chart-bars-container {
+  flex: 1;
+  overflow-x: auto;
+}
+
+.chart-bars {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  height: 320px;
+  padding-bottom: 50px;
+  min-width: 100%;
+  overflow: visible;
+}
+
+.chart-bar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 60px;
+}
+
+.chart-bar-container {
+  height: 320px;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  justify-content: center;
+  overflow: visible;
+  position: relative;
+  padding-top: 30px;
+  box-sizing: border-box;
+}
+
+.chart-bar {
+  width: 100%;
+  max-width: 50px;
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 5px;
+}
+
+.chart-bar:hover {
+  opacity: 0.8;
+  transform: scaleY(1.05);
+}
+
+.chart-bar-value {
+  font-size: 0.75rem;
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.chart-bar-label {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #666;
+  text-align: center;
+  white-space: nowrap;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chart-date {
+  font-weight: 600;
+  color: #333;
+}
+
+.chart-day {
+  font-size: 0.75rem;
+  color: #999;
+}
+
+.chart-score {
+  font-size: 0.8rem;
+  color: #667eea;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.chart-bar-empty {
+  width: 100%;
+  max-width: 50px;
+  height: 0;
+  border: 1px dashed #ddd;
+  border-radius: 8px;
+}
+
+.chart-x-axis-label {
+  text-align: center;
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 10px;
+}
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chart-legend-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.chart-legend-label {
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 500;
+}
+
+.chart-bars-group {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  height: 100%;
+  gap: 2px;
+}
+
+.chart-bar-grouped {
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  transition: all 0.3s;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 8px;
+  min-height: 30px;
+  box-sizing: border-box;
+}
+
+.chart-bar-grouped:hover {
+  opacity: 0.8;
+  transform: scaleY(1.05);
+}
+
+.chart-bar-usage {
+  font-size: 0.65rem;
+  color: white;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  margin-top: 2px;
+}
+
+.chart-bar-manufacturer-name {
+  font-size: 0.75rem;
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  text-align: center;
+  width: 100%;
+  z-index: 10;
+}
 

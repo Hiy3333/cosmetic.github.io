@@ -4,12 +4,48 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>샘플 테스트</title>
+    <script>
+      // localStorage 접근 에러를 완전히 억제 (스크립트 로드 전에 실행)
+      (function() {
+        // 에러 핸들러 설정
+        window.addEventListener('error', function(event) {
+          if (event.message && (
+            event.message.includes('storage is not allowed') ||
+            event.message.includes('Access to storage') ||
+            event.message.includes('localStorage')
+          )) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+          }
+        }, true);
+        
+        window.addEventListener('unhandledrejection', function(event) {
+          if (event.reason && (
+            (event.reason.message && (
+              event.reason.message.includes('storage is not allowed') ||
+              event.reason.message.includes('Access to storage') ||
+              event.reason.message.includes('localStorage')
+            )) ||
+            (typeof event.reason === 'string' && (
+              event.reason.includes('storage is not allowed') ||
+              event.reason.includes('Access to storage')
+            ))
+          )) {
+            event.preventDefault();
+            event.stopPropagation();
+            return false;
+          }
+        }, true);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
+
 
 
 

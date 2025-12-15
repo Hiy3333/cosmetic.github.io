@@ -60,7 +60,11 @@ function App() {
           <div className="nav-buttons">
             <button
               className={`nav-btn ${currentPage === 'home' ? 'active' : ''}`}
-              onClick={() => setCurrentPage('home')}
+              onClick={() => {
+                setCurrentPage('home')
+                // 통계 페이지로 이동할 때 데이터 새로고침을 위한 이벤트 발생
+                window.dispatchEvent(new Event('refreshStatistics'))
+              }}
             >
               통계
             </button>
@@ -79,7 +83,7 @@ function App() {
 
       <div className="app-container">
         {currentPage === 'home' ? (
-          <Statistics />
+          <Statistics key="statistics" />
         ) : (
           <div className="test-page-container">
             <div className="test-page-content">

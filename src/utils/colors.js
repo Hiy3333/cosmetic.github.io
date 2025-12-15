@@ -1,22 +1,31 @@
-// 제조사별 색상 생성 유틸리티
+/**
+ * 제조사별 색상 생성 함수 (테스트 상세 정보 모달과 동일한 방식)
+ * HSL 색상 공간을 사용하여 골든 앵글 근사값으로 색상 분산
+ * @param {number} index - 제조사 인덱스 (0부터 시작)
+ * @returns {Object} { gradient: string, solid: string } 색상 객체
+ */
+export const getManufacturerColor = (index) => {
+  const hue = (index * 137.508) % 360 // 골든 앵글 근사값으로 색상 분산
+  const color1 = `hsl(${hue}, 70%, 60%)`
+  const color2 = `hsl(${(hue + 30) % 360}, 70%, 50%)`
+  
+  return {
+    gradient: `linear-gradient(180deg, ${color1} 0%, ${color2} 100%)`,
+    solid: color1
+  }
+}
 
-// HSL 색상 공간을 사용하여 제조사별로 고유한 색상 생성
-// Golden angle approximation을 사용하여 색상 분산 최적화
+/**
+ * 제조사 목록을 받아서 색상 매핑을 생성하는 함수
+ * 모든 차트에서 동일한 색상과 순서를 보장하기 위해 사용
+ * @param {Array<string>} manufacturers - 정렬된 제조사 목록
+ * @returns {Map<string, Object>} 제조사별 색상 맵
+ */
 export const createManufacturerColorMap = (manufacturers) => {
-  const colorMap = {}
-  const goldenAngle = 137.508 // Golden angle in degrees
-  
-  manufacturers.forEach((manufacturer, index) => {
-    // Hue: Golden angle을 사용하여 균등하게 분산
-    const hue = (index * goldenAngle) % 360
-    // Saturation: 60-80% 사이 (너무 진하지 않게)
-    const saturation = 60 + (index % 3) * 5 // 60, 65, 70
-    // Lightness: 45-55% 사이 (가독성 유지)
-    const lightness = 50 + (index % 2) * 3 // 50, 53
-    
-    colorMap[manufacturer] = `hsl(${hue}, ${saturation}%, ${lightness}%)`
+  const map = new Map()
+  manufacturers.forEach((mfr, index) => {
+    map.set(mfr, getManufacturerColor(index))
   })
-  
-  return colorMap
+  return map
 }
 
