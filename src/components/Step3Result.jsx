@@ -11,10 +11,15 @@ function Step3Result({ formData, onReset }) {
     const saveData = async () => {
       try {
         if (!hasSavedRef.current && formData.manufacturer && Object.keys(formData.scores || {}).length > 0) {
+          console.log('저장할 데이터:', formData)
+          console.log('저장할 날짜:', formData.testDate)
           const result = await saveTestData(formData)
           if (result) {
             console.log('데이터 저장 성공:', result)
+            console.log('저장된 날짜:', result.date)
             hasSavedRef.current = true
+            // 저장 성공 후 통계 페이지 새로고침 이벤트 발생
+            window.dispatchEvent(new Event('refreshStatistics'))
           } else {
             console.warn('데이터 저장 실패: 저장 결과가 null입니다.')
           }

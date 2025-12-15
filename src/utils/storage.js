@@ -16,6 +16,10 @@ export const saveTestData = async (formData) => {
     const testDate = formData.testDate || new Date().toISOString().split('T')[0]
     const timeSlot = formData.timeSlot || ''
     
+    // 날짜 형식 확인 및 정규화 (YYYY-MM-DD)
+    console.log('저장할 날짜 (원본):', formData.testDate)
+    console.log('저장할 날짜 (정규화):', testDate)
+    
     // 중복 체크: 같은 날짜, 시간대, 작성자, 제조사, 샘플 넘버, 회차의 테스트가 이미 있는지 확인
     const { data: existingTests, error: checkError } = await supabase
       .from('tests')
@@ -112,9 +116,9 @@ export const getTestData = async () => {
     }
     
     // 반환 형식을 기존과 동일하게 맞춤
-    return (data || []).map(test => ({
+    const mappedData = (data || []).map(test => ({
       id: test.id,
-      date: test.date,
+      date: test.date, // 날짜 형식 그대로 유지 (YYYY-MM-DD)
       timeSlot: test.time_slot || '',
       manufacturer: test.manufacturer,
       sampleNumber: test.sample_number,
@@ -126,6 +130,9 @@ export const getTestData = async () => {
       totalScore: test.total_score,
       averageScore: test.average_score
     }))
+    
+    console.log('불러온 테스트 데이터 날짜 목록:', [...new Set(mappedData.map(t => t.date))])
+    return mappedData
   } catch (error) {
     console.error('데이터 불러오기 실패:', error)
     return []

@@ -275,7 +275,10 @@ function Statistics() {
 
   // 테스트가 있는 날짜 목록
   const getTestDates = () => {
-    return [...new Set(testData.map(test => test.date))]
+    const dates = [...new Set(testData.map(test => test.date).filter(Boolean))]
+    console.log('통계 페이지 테스트 날짜 목록:', dates)
+    console.log('현재 testData:', testData)
+    return dates
   }
 
   // 테스트 항목 클릭 핸들러
