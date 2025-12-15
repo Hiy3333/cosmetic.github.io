@@ -12,17 +12,20 @@ export const saveTestData = async (formData) => {
       return null
     }
     
-    const today = new Date().toISOString().split('T')[0]
+    // formData에서 날짜 가져오기 (없으면 오늘 날짜)
+    const testDate = formData.testDate || new Date().toISOString().split('T')[0]
+    const timeSlot = formData.timeSlot || ''
     
-    // 중복 체크: 같은 날짜, 작성자, 제조사, 샘플 넘버, 회차의 테스트가 이미 있는지 확인
+    // 중복 체크: 같은 날짜, 시간대, 작성자, 제조사, 샘플 넘버, 회차의 테스트가 이미 있는지 확인
     const { data: existingTests, error: checkError } = await supabase
       .from('tests')
       .select('*')
-      .eq('date', today)
+      .eq('date', testDate)
       .eq('author', formData.author)
       .eq('manufacturer', formData.manufacturer)
       .eq('sample_number', formData.sampleNumber)
       .eq('usage_count', formData.usageCount)
+      .eq('time_slot', timeSlot)
     
     if (checkError) {
       console.error('중복 체크 실패:', checkError)
@@ -48,7 +51,8 @@ export const saveTestData = async (formData) => {
       .from('tests')
       .insert([
         {
-          date: today,
+          date: testDate,
+          time_slot: timeSlot,
           manufacturer: formData.manufacturer,
           sample_number: formData.sampleNumber,
           author: formData.author,
@@ -111,6 +115,7 @@ export const getTestData = async () => {
     return (data || []).map(test => ({
       id: test.id,
       date: test.date,
+      timeSlot: test.time_slot || '',
       manufacturer: test.manufacturer,
       sampleNumber: test.sample_number,
       author: test.author,

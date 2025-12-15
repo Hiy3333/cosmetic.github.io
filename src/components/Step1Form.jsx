@@ -3,6 +3,11 @@ import { getManufacturers, saveManufacturers, getAuthors, saveAuthors, getPrevio
 import './Step1Form.css'
 
 function Step1Form({ formData, onNext }) {
+  // 날짜와 시간대 상태
+  const today = new Date().toISOString().split('T')[0]
+  const [testDate, setTestDate] = useState(formData.testDate || today)
+  const [timeSlot, setTimeSlot] = useState(formData.timeSlot || '')
+  
   const [manufacturer, setManufacturer] = useState(formData.manufacturer || '')
   const [sampleNumber, setSampleNumber] = useState(formData.sampleNumber || '')
   const [author, setAuthor] = useState(formData.author || '')
@@ -198,6 +203,20 @@ function Step1Form({ formData, onNext }) {
     e.preventDefault()
     
     // 모든 필드 검증
+    if (!testDate) {
+      alert('테스트 날짜를 선택해주세요.')
+      return
+    }
+    if (!timeSlot) {
+      alert('시간대를 입력해주세요.')
+      return
+    }
+    // 시간 형식 검증 (HH:MM)
+    const timePattern = /^([0-1]?[0-9]|2[0-3]):([0-5][0-9])$/
+    if (!timePattern.test(timeSlot)) {
+      alert('올바른 시간 형식으로 입력해주세요. (예: 09:30, 14:15)')
+      return
+    }
     if (!manufacturer) {
       alert('제조사명을 선택해주세요.')
       return
@@ -219,9 +238,9 @@ function Step1Form({ formData, onNext }) {
       return
     }
 
-    // 하루에 여러 번 테스트 가능하도록 변경 (제한 제거)
-
     onNext({
+      testDate,
+      timeSlot,
       manufacturer,
       sampleNumber,
       author,
@@ -232,6 +251,67 @@ function Step1Form({ formData, onNext }) {
 
   return (
     <form className="step1-form" onSubmit={handleSubmit}>
+      {/* 테스트 날짜 선택 */}
+      <div className="form-group">
+        <label>테스트 날짜 *</label>
+        <input
+          type="date"
+          value={testDate}
+          onChange={(e) => setTestDate(e.target.value)}
+          max={today}
+          className="form-input"
+          required
+        />
+      </div>
+
+      {/* 시간대 입력 */}
+      <div className="form-group">
+        <label>시간대 *</label>
+        <div className="input-wrapper">
+          <input
+            type="text"
+            value={timeSlot}
+            onChange={(e) => {
+              const value = e.target.value
+              // 숫자와 콜론만 허용, 최대 5자 (HH:MM)
+              if (value === '' || /^([0-1]?[0-9]|2[0-3]):?([0-5]?[0-9])?$/.test(value)) {
+                // 자동으로 콜론 추가
+                let formatted = value.replace(/[^0-9]/g, '')
+                if (formatted.length > 2) {
+                  formatted = formatted.slice(0, 2) + ':' + formatted.slice(2, 4)
+                } else if (formatted.length === 2 && !value.includes(':')) {
+                  // 2자리 입력 후 자동으로 콜론 추가
+                  formatted = formatted + ':'
+                }
+                setTimeSlot(formatted)
+              }
+            }}
+            onBlur={(e) => {
+              // 포커스 해제 시 형식 검증 및 자동 보정
+              const value = e.target.value.trim()
+              if (value) {
+                const parts = value.split(':')
+                if (parts.length === 2) {
+                  let hours = parseInt(parts[0]) || 0
+                  let minutes = parseInt(parts[1]) || 0
+                  if (hours > 23) hours = 23
+                  if (minutes > 59) minutes = 59
+                  setTimeSlot(`${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`)
+                }
+              }
+            }}
+            placeholder="예: 09:30"
+            className="form-input"
+            maxLength={5}
+            required
+          />
+          <span className="input-suffix">시:분</span>
+        </div>
+        <small style={{ color: '#666', fontSize: '0.85rem', marginTop: '4px' }}>
+          24시간 형식으로 입력하세요 (예: 09:30, 14:15, 21:00)
+        </small>
+      </div>
+
       {/* 제조사명 선택 */}
       <div className="form-group">
         <label>OEM 제조사명 *</label>

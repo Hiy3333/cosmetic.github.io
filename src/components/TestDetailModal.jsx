@@ -154,6 +154,7 @@ function TestDetailModal({ tests, date, onClose, onDelete, selectedAuthor, selec
                   month: 'long',
                   day: 'numeric'
                 })}
+                {firstTest.timeSlot && ` (${firstTest.timeSlot})`}
               </span>
             </div>
           </div>

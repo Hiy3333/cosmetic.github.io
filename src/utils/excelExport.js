@@ -99,14 +99,16 @@ const createSheetForManufacturer = (wb, manufacturer, tests) => {
   // 빈 행
   data.push([])
 
-  // 헤더 구조: 날짜, 작성자, 샘플, 피부타입, 회차
-  // 첫 번째 헤더 행: 분류 | 테스트 항목 | 날짜 (각 회차마다) | ...
+  // 헤더 구조: 날짜/시간대, 작성자, 샘플, 피부타입, 회차
+  // 첫 번째 헤더 행: 분류 | 테스트 항목 | 날짜/시간대 (각 회차마다) | ...
   const headerRow1 = ['분류', '테스트 항목']
   sortedAuthors.forEach(author => {
     const authorTests = testsByAuthor[author]
     authorTests.forEach(test => {
       const dateStr = test.date ? new Date(test.date).toISOString().split('T')[0] : ''
-      headerRow1.push(dateStr)
+      const timeStr = test.timeSlot || ''
+      const dateTimeStr = timeStr ? `${dateStr} ${timeStr}` : dateStr
+      headerRow1.push(dateTimeStr)
     })
   })
   data.push(headerRow1)

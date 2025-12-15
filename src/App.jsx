@@ -10,6 +10,8 @@ function App() {
   const [step, setStep] = useState(1)
   const [formData, setFormData] = useState({
     // Step 1 데이터
+    testDate: '',
+    timeSlot: '',
     manufacturer: '',
     sampleNumber: '',
     author: '',
@@ -39,7 +41,10 @@ function App() {
   // 처음으로 돌아가기
   const handleReset = () => {
     setStep(1)
+    const today = new Date().toISOString().split('T')[0]
     setFormData({
+      testDate: today,
+      timeSlot: '',
       manufacturer: '',
       sampleNumber: '',
       author: '',
