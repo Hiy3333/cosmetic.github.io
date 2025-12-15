@@ -144,13 +144,24 @@ function Step2Form({ onNext, onBack }) {
       return
     }
     
-    // 모든 항목에 점수가 있는지 확인 (선택사항이므로 경고만)
+    // 모든 항목에 점수가 있는지 확인 (필수)
     const missingItems = testItems.filter(item => scores[item] === undefined)
     if (missingItems.length > 0) {
-      const confirm = window.confirm(
-        `${missingItems.length}개의 항목에 점수가 입력되지 않았습니다. 계속하시겠습니까?`
-      )
-      if (!confirm) return
+      alert(`다음 항목에 대한 평가를 완료해주세요:\n${missingItems.join(', ')}\n\n모든 항목을 평가해야 다음 단계로 진행할 수 있습니다.`)
+      // 누락된 항목 중 첫 번째 항목으로 스크롤
+      const firstMissingItem = missingItems[0]
+      const missingElement = itemRefs.current[firstMissingItem]
+      const container = document.querySelector('.test-items-container')
+      if (missingElement && container) {
+        const containerRect = container.getBoundingClientRect()
+        const elementRect = missingElement.getBoundingClientRect()
+        const scrollTop = container.scrollTop + (elementRect.top - containerRect.top) - 20
+        container.scrollTo({
+          top: scrollTop,
+          behavior: 'smooth'
+        })
+      }
+      return
     }
 
     onNext(scores, improvement)
