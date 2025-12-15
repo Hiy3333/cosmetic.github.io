@@ -282,3 +282,72 @@
   transform: translateY(-1px);
 }
 
+/* 모바일 반응형 스타일 */
+@media (max-width: 768px) {
+  .step3-result {
+    gap: 20px;
+  }
+
+  .result-title {
+    font-size: 1.5rem;
+  }
+
+  .result-section {
+    padding: 20px;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .info-label {
+    font-size: 0.85rem;
+  }
+
+  .info-value {
+    font-size: 1rem;
+  }
+
+  .score-summary {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .score-card {
+    padding: 20px;
+  }
+
+  .score-value.large {
+    font-size: 1.6rem;
+  }
+
+  .score-item-name {
+    min-width: 120px;
+    font-size: 0.9rem;
+  }
+
+  .score-number {
+    min-width: 40px;
+    font-size: 1rem;
+  }
+
+  .result-buttons {
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .btn-excel,
+  .btn-reset {
+    padding: 14px 24px;
+    font-size: 1rem;
+  }
+}
+

@@ -298,3 +298,69 @@
 
 /* 시간대 입력 스타일은 form-input과 동일하게 사용 */
 
+/* 모바일 반응형 스타일 */
+@media (max-width: 768px) {
+  .step1-form {
+    gap: 20px;
+  }
+
+  .form-group {
+    gap: 6px;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .form-input {
+    padding: 12px 15px;
+    font-size: 0.95rem;
+  }
+
+  .dropdown-input {
+    padding: 12px 15px;
+    font-size: 0.95rem;
+  }
+
+  .input-wrapper {
+    flex-wrap: wrap;
+  }
+
+  .input-prefix,
+  .input-suffix {
+    font-size: 0.85rem;
+  }
+
+  .previous-usage-hint {
+    font-size: 0.8rem;
+    margin-left: 0;
+    margin-top: 4px;
+    width: 100%;
+  }
+
+  .btn-next {
+    padding: 14px 24px;
+    font-size: 1rem;
+    margin-top: 20px;
+  }
+
+  .add-manufacturer-form {
+    padding: 12px;
+  }
+
+  .add-input {
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+
+  .add-buttons {
+    flex-direction: column;
+  }
+
+  .btn-add,
+  .btn-cancel {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
