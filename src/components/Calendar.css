@@ -191,3 +191,95 @@
   background: #ff69b4;
 }
 
+/* 모바일 반응형 스타일 */
+@media (max-width: 768px) {
+  .calendar {
+    padding: 15px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .calendar-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 15px;
+  }
+
+  .calendar-nav-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+  }
+
+  .calendar-month-year {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .calendar-month {
+    font-size: 1.2rem;
+  }
+
+  .calendar-year {
+    font-size: 1rem;
+  }
+
+  .calendar-today-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .calendar-weekdays {
+    gap: 3px;
+    margin-bottom: 8px;
+  }
+
+  .calendar-weekday {
+    padding: 8px 4px;
+    font-size: 0.75rem;
+  }
+
+  .calendar-days {
+    gap: 3px;
+  }
+
+  .calendar-day {
+    min-height: 50px;
+    padding: 4px;
+  }
+
+  .calendar-day-number {
+    font-size: 0.85rem;
+    margin-bottom: 1px;
+  }
+
+  .calendar-day-scores {
+    gap: 1px;
+    margin-top: 2px;
+  }
+
+  .calendar-day-score-item {
+    font-size: 0.55rem;
+    line-height: 1.1;
+    word-break: break-word;
+    max-width: 100%;
+  }
+
+  .calendar-test-indicator {
+    width: 6px;
+    height: 6px;
+    bottom: 4px;
+  }
+
+  .calendar-legend {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+  }
+
+  .legend-item {
+    font-size: 0.85rem;
+  }
+}
+
