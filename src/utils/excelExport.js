@@ -103,62 +103,71 @@ const createSheetForManufacturer = (wb, manufacturer, tests) => {
   // 빈 행
   data.push([])
 
-  // 헤더 구조: 날짜/시간대, 작성자, 샘플, 피부타입, 회차
-  // 첫 번째 헤더 행: 분류 | 테스트 항목 | 날짜/시간대 (각 회차마다) | ...
+  // 헤더 구조: 날짜, 시간대, 작성자, 샘플, 피부타입, 회차
+  // 첫 번째 헤더 행: 분류 | 테스트 항목 | 날짜 (각 회차마다) | ...
   const headerRow1 = ['분류', '테스트 항목']
   sortedAuthors.forEach(author => {
     const authorTests = testsByAuthor[author]
     authorTests.forEach(test => {
       const dateStr = test.date ? new Date(test.date).toISOString().split('T')[0] : ''
-      const timeStr = test.timeSlot || ''
-      const dateTimeStr = timeStr ? `${dateStr} ${timeStr}` : dateStr
-      headerRow1.push(dateTimeStr)
+      headerRow1.push(dateStr)
     })
   })
   data.push(headerRow1)
 
-  // 두 번째 헤더 행: 빈칸 | 빈칸 | 작성자 (각 회차마다) | ...
+  // 두 번째 헤더 행: 빈칸 | 빈칸 | 시간대 (각 회차마다) | ...
   const headerRow2 = ['', '']
   sortedAuthors.forEach(author => {
     const authorTests = testsByAuthor[author]
-    authorTests.forEach(() => {
-      headerRow2.push(author)
+    authorTests.forEach(test => {
+      const timeStr = test.timeSlot || ''
+      headerRow2.push(timeStr)
     })
   })
   data.push(headerRow2)
 
-  // 세 번째 헤더 행: 빈칸 | 빈칸 | 샘플 (각 회차마다) | ...
+  // 세 번째 헤더 행: 빈칸 | 빈칸 | 작성자 (각 회차마다) | ...
   const headerRow3 = ['', '']
   sortedAuthors.forEach(author => {
     const authorTests = testsByAuthor[author]
-    authorTests.forEach(test => {
-      const sampleLabel = test.sampleNumber ? `샘플 ${test.sampleNumber}` : '샘플 미지정'
-      headerRow3.push(sampleLabel)
+    authorTests.forEach(() => {
+      headerRow3.push(author)
     })
   })
   data.push(headerRow3)
 
-  // 네 번째 헤더 행: 빈칸 | 빈칸 | 피부타입 (각 회차마다) | ...
+  // 네 번째 헤더 행: 빈칸 | 빈칸 | 샘플 (각 회차마다) | ...
   const headerRow4 = ['', '']
   sortedAuthors.forEach(author => {
     const authorTests = testsByAuthor[author]
     authorTests.forEach(test => {
-      const skinType = test.skinType || ''
-      headerRow4.push(skinType)
+      const sampleLabel = test.sampleNumber ? `샘플 ${test.sampleNumber}` : '샘플 미지정'
+      headerRow4.push(sampleLabel)
     })
   })
   data.push(headerRow4)
 
-  // 다섯 번째 헤더 행: 빈칸 | 빈칸 | 회차 (각 회차마다) | ...
+  // 다섯 번째 헤더 행: 빈칸 | 빈칸 | 피부타입 (각 회차마다) | ...
   const headerRow5 = ['', '']
   sortedAuthors.forEach(author => {
     const authorTests = testsByAuthor[author]
     authorTests.forEach(test => {
-      const usage = test.usageCount ? `${test.usageCount}회차` : ''
-      headerRow5.push(usage)
+      const skinType = test.skinType || ''
+      headerRow5.push(skinType)
     })
   })
   data.push(headerRow5)
+
+  // 여섯 번째 헤더 행: 빈칸 | 빈칸 | 회차 (각 회차마다) | ...
+  const headerRow6 = ['', '']
+  sortedAuthors.forEach(author => {
+    const authorTests = testsByAuthor[author]
+    authorTests.forEach(test => {
+      const usage = test.usageCount ? `${test.usageCount}회차` : ''
+      headerRow6.push(usage)
+    })
+  })
+  data.push(headerRow6)
 
   // 테스트 항목별 데이터
   Object.entries(testItemCategories).forEach(([category, items]) => {
@@ -273,7 +282,7 @@ const createSheetForManufacturer = (wb, manufacturer, tests) => {
   ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: totalCols - 1 } })
   
   // 헤더 병합: 각 작성자의 회차들을 세로로 병합
-  // 행 번호: 0=제목, 1=빈행, 2=기본정보, 3=빈행, 4=날짜, 5=작성자, 6=샘플, 7=피부타입, 8=회차, 9=첫번째데이터
+  // 행 번호: 0=제목, 1=빈행, 2=기본정보, 3=빈행, 4=날짜, 5=시간대, 6=작성자, 7=샘플, 8=피부타입, 9=회차, 10=첫번째데이터
   let headerCol = 2 // 분류, 테스트 항목 다음부터
   sortedAuthors.forEach(author => {
     const authorTests = testsByAuthor[author]
@@ -306,10 +315,39 @@ const createSheetForManufacturer = (wb, manufacturer, tests) => {
         })
       }
 
-      // 작성자 행 병합 (행 5)
+      // 시간대 행 병합: 같은 날짜와 시간대끼리만 병합
+      let timeStartCol = headerCol
+      let currentDateTime = authorTests[0].date ? new Date(authorTests[0].date).toISOString().split('T')[0] : ''
+      currentDateTime += (authorTests[0].timeSlot || '')
+      
+      for (let i = 1; i < authorTests.length; i++) {
+        const testDate = authorTests[i].date ? new Date(authorTests[i].date).toISOString().split('T')[0] : ''
+        const testDateTime = testDate + (authorTests[i].timeSlot || '')
+        if (testDateTime !== currentDateTime) {
+          const timeEndCol = headerCol + i - 1
+          if (timeEndCol > timeStartCol) {
+            ws['!merges'].push({ 
+              s: { r: 5, c: timeStartCol }, 
+              e: { r: 5, c: timeEndCol } 
+            })
+          }
+          timeStartCol = headerCol + i
+          currentDateTime = testDateTime
+        }
+      }
+      // 마지막 시간대 범위 병합
+      const timeEndCol = headerCol + authorTests.length - 1
+      if (timeEndCol > timeStartCol) {
+        ws['!merges'].push({ 
+          s: { r: 5, c: timeStartCol }, 
+          e: { r: 5, c: timeEndCol } 
+        })
+      }
+
+      // 작성자 행 병합 (행 6)
       ws['!merges'].push({ 
-        s: { r: 5, c: headerCol }, 
-        e: { r: 5, c: headerCol + authorTests.length - 1 } 
+        s: { r: 6, c: headerCol }, 
+        e: { r: 6, c: headerCol + authorTests.length - 1 } 
       })
 
       // 샘플 행 병합: 같은 샘플끼리만 병합
@@ -322,8 +360,8 @@ const createSheetForManufacturer = (wb, manufacturer, tests) => {
           const sampleEndCol = headerCol + i - 1
           if (sampleEndCol > sampleStartCol) {
             ws['!merges'].push({ 
-              s: { r: 6, c: sampleStartCol }, 
-              e: { r: 6, c: sampleEndCol } 
+              s: { r: 7, c: sampleStartCol }, 
+              e: { r: 7, c: sampleEndCol } 
             })
           }
           sampleStartCol = headerCol + i
@@ -334,8 +372,8 @@ const createSheetForManufacturer = (wb, manufacturer, tests) => {
       const sampleEndCol = headerCol + authorTests.length - 1
       if (sampleEndCol > sampleStartCol) {
         ws['!merges'].push({ 
-          s: { r: 6, c: sampleStartCol }, 
-          e: { r: 6, c: sampleEndCol } 
+          s: { r: 7, c: sampleStartCol }, 
+          e: { r: 7, c: sampleEndCol } 
         })
       }
 
@@ -349,8 +387,8 @@ const createSheetForManufacturer = (wb, manufacturer, tests) => {
           const skinEndCol = headerCol + i - 1
           if (skinEndCol > skinStartCol) {
             ws['!merges'].push({ 
-              s: { r: 7, c: skinStartCol }, 
-              e: { r: 7, c: skinEndCol } 
+              s: { r: 8, c: skinStartCol }, 
+              e: { r: 8, c: skinEndCol } 
             })
           }
           skinStartCol = headerCol + i
@@ -361,8 +399,8 @@ const createSheetForManufacturer = (wb, manufacturer, tests) => {
       const skinEndCol = headerCol + authorTests.length - 1
       if (skinEndCol > skinStartCol) {
         ws['!merges'].push({ 
-          s: { r: 7, c: skinStartCol }, 
-          e: { r: 7, c: skinEndCol } 
+          s: { r: 8, c: skinStartCol }, 
+          e: { r: 8, c: skinEndCol } 
         })
       }
     }
@@ -370,8 +408,8 @@ const createSheetForManufacturer = (wb, manufacturer, tests) => {
   })
   
   // 카테고리 병합 (각 카테고리의 첫 번째 행부터 마지막 행까지)
-  // 행 번호: 0=제목, 1=빈행, 2=기본정보, 3=빈행, 4=날짜, 5=작성자, 6=샘플, 7=피부타입, 8=회차, 9=첫번째데이터
-  let currentRow = 9 // 테이블 헤더 다음 행부터 시작 (0-based index, 헤더가 5줄이므로 9부터)
+  // 행 번호: 0=제목, 1=빈행, 2=기본정보, 3=빈행, 4=날짜, 5=시간대, 6=작성자, 7=샘플, 8=피부타입, 9=회차, 10=첫번째데이터
+  let currentRow = 10 // 테이블 헤더 다음 행부터 시작 (0-based index, 헤더가 6줄이므로 10부터)
   Object.entries(testItemCategories).forEach(([category, items]) => {
     if (items.length > 1) {
       ws['!merges'].push({ 
