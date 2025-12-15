@@ -175,7 +175,7 @@ function Step2Form({ onNext, onBack }) {
       <div className="test-items-container">
         {testItems.map((item, index) => {
           // 텍스트창이 필요한 항목들
-          const itemsNeedingFeedback = ['피막감', '유분감', '제형 안정성', '후속화장품 흡수', '점도']
+          const itemsNeedingFeedback = ['피막감', '끈적임', '제형 안정성', '후속화장품 흡수', '점도(육안)']
           
           // 이전 항목 중 확인이 필요한 항목이 있는지 확인
           const hasUnconfirmedPreviousItem = testItems.slice(0, index).some(prevItem => {

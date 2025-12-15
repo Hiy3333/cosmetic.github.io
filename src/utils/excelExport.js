@@ -4,21 +4,22 @@ import { getTestData } from './storage'
 // 테스트 항목을 카테고리별로 매핑
 const testItemCategories = {
   '외관&물성': [
-    { name: '점도', key: '점도' },
+    { name: '점도(육안)', key: '점도(육안)' },
     { name: '제형 안정성', key: '제형 안정성' }
   ],
   '사용감': [
     { name: '롤링감(뭉침)', key: '롤링감(뭉침)' },
     { name: '흡수 속도', key: '흡수 속도' },
     { name: '흡수 후 잔감', key: '흡수 후 잔감' },
-    { name: '피막감', key: '피막감' },
     { name: '재도포', key: '재도포' },
     { name: '후속화장품 흡수', key: '후속화장품 흡수' },
     { name: '수분감(속)', key: '수분감(속)' },
     { name: '수분감(겉)', key: '수분감(겉)' },
     { name: '피부결 개선', key: '피부결 개선' },
     { name: '진정감', key: '진정감' },
-    { name: '보습 지속력', key: '보습 지속력' }
+    { name: '보습 지속력', key: '보습 지속력' },
+    { name: '피막감', key: '피막감' },
+    { name: '끈적임', key: '끈적임' }
   ],
   '안정성': [
     { name: '따가움', key: '따가움' },
@@ -26,6 +27,9 @@ const testItemCategories = {
     { name: '홍반', key: '홍반' },
     { name: '열감', key: '열감' },
     { name: '트러블', key: '트러블' }
+  ],
+  '기타': [
+    { name: '타깃 제품과 제형 유사성', key: '타깃 제품과 제형 유사성' }
   ]
 }
 
