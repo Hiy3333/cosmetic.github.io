@@ -1,8 +1,7 @@
-// Supabase 클라이언트 설정
-import { createClient } from '@supabase/supabase-js'
+// Supabase REST API 클라이언트
+// localStorage 문제를 완전히 회피하기 위해 Supabase JS 라이브러리 대신 fetch API 사용
 
 // 환경 변수에서 Supabase URL과 API Key 가져오기
-// 개발 환경에서는 .env 파일에서, 프로덕션에서는 환경 변수에서 가져옵니다
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
@@ -14,207 +13,234 @@ export const isSupabaseConfigured = () => {
          !supabaseAnonKey.includes('placeholder')
 }
 
-// 완전히 안전한 가짜 스토리지 객체 생성 (모든 메서드 구현)
-const createFakeStorage = () => {
-  const noop = function() { return null }
-  const noopAsync = function() { return Promise.resolve(null) }
-  
-  const storage = {
-    getItem: noop,
-    setItem: noop,
-    removeItem: noop,
-    clear: noop,
-    key: noop,
-    length: 0
-  }
-  
-  // Proxy를 사용하여 모든 접근을 차단하고 에러 발생 방지
-  return new Proxy(storage, {
-    get: function(target, prop) {
-      // 존재하는 메서드 반환
-      if (prop in target) {
-        return target[prop]
+// REST API 기본 헤더
+const getHeaders = () => ({
+  'apikey': supabaseAnonKey,
+  'Authorization': `Bearer ${supabaseAnonKey}`,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+})
+
+// REST API 헬퍼 함수
+export const supabaseAPI = {
+  // SELECT 쿼리
+  select: async (table, options = {}) => {
+    try {
+      const { 
+        select = '*', 
+        eq = {}, 
+        order = null, 
+        limit = null,
+        single = false 
+      } = options
+      
+      let url = `${supabaseUrl}/rest/v1/${table}?select=${select}`
+      
+      // 필터링 추가 (eq)
+      Object.entries(eq).forEach(([key, value]) => {
+        url += `&${key}=eq.${encodeURIComponent(value)}`
+      })
+      
+      // 정렬 추가
+      if (order) {
+        const direction = order.ascending ? 'asc' : 'desc'
+        url += `&order=${order.column}.${direction}`
       }
-      // 알려진 async 메서드들
-      if (prop === 'then' || prop === 'catch' || prop === 'finally') {
-        return undefined // Promise가 아님을 명시
+      
+      // 제한 추가
+      if (limit) {
+        url += `&limit=${limit}`
       }
-      // 다른 모든 메서드는 noop 반환
-      return noop
-    },
-    set: function(target, prop, value) {
-      // 모든 설정 시도를 조용히 무시하고 성공으로 반환
-      return true
-    },
-    has: function(target, prop) {
-      return prop in target
-    },
-    ownKeys: function() {
-      return ['getItem', 'setItem', 'removeItem', 'clear', 'key', 'length']
-    },
-    getOwnPropertyDescriptor: function(target, prop) {
-      if (prop in target) {
-        return {
-          enumerable: true,
-          configurable: true,
-          writable: true,
-          value: target[prop]
-        }
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: getHeaders()
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        console.error('SELECT 실패:', error)
+        return { data: null, error }
       }
-      return undefined
+      
+      const data = await response.json()
+      
+      // single 모드면 첫 번째 항목만 반환
+      if (single) {
+        return { data: data[0] || null, error: null }
+      }
+      
+      return { data, error: null }
+    } catch (error) {
+      console.error('SELECT 오류:', error)
+      return { data: null, error }
     }
-  })
+  },
+  
+  // INSERT 쿼리
+  insert: async (table, records, options = {}) => {
+    try {
+      const { single = false } = options
+      
+      const response = await fetch(`${supabaseUrl}/rest/v1/${table}`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(records)
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        console.error('INSERT 실패:', error)
+        return { data: null, error }
+      }
+      
+      const data = await response.json()
+      
+      // single 모드면 첫 번째 항목만 반환
+      if (single) {
+        return { data: Array.isArray(data) ? data[0] : data, error: null }
+      }
+      
+      return { data, error: null }
+    } catch (error) {
+      console.error('INSERT 오류:', error)
+      return { data: null, error }
+    }
+  },
+  
+  // UPDATE 쿼리
+  update: async (table, updates, eq = {}) => {
+    try {
+      let url = `${supabaseUrl}/rest/v1/${table}?`
+      
+      // 필터링 추가
+      Object.entries(eq).forEach(([key, value]) => {
+        url += `${key}=eq.${encodeURIComponent(value)}&`
+      })
+      
+      url = url.slice(0, -1) // 마지막 & 제거
+      
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: getHeaders(),
+        body: JSON.stringify(updates)
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        console.error('UPDATE 실패:', error)
+        return { data: null, error }
+      }
+      
+      const data = await response.json()
+      return { data, error: null }
+    } catch (error) {
+      console.error('UPDATE 오류:', error)
+      return { data: null, error }
+    }
+  },
+  
+  // DELETE 쿼리
+  delete: async (table, eq = {}) => {
+    try {
+      let url = `${supabaseUrl}/rest/v1/${table}?`
+      
+      // 필터링 추가
+      Object.entries(eq).forEach(([key, value]) => {
+        url += `${key}=eq.${encodeURIComponent(value)}&`
+      })
+      
+      url = url.slice(0, -1) // 마지막 & 제거
+      
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: getHeaders()
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        console.error('DELETE 실패:', error)
+        return { error }
+      }
+      
+      return { error: null }
+    } catch (error) {
+      console.error('DELETE 오류:', error)
+      return { error }
+    }
+  },
+  
+  // UPSERT 쿼리
+  upsert: async (table, records, options = {}) => {
+    try {
+      const { onConflict = null } = options
+      
+      const headers = { ...getHeaders() }
+      if (onConflict) {
+        headers['Prefer'] = `return=representation,resolution=merge-duplicates`
+      }
+      
+      const response = await fetch(`${supabaseUrl}/rest/v1/${table}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(records)
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        // 중복 에러(23505)는 무시
+        if (error.code === '23505') {
+          return { data: null, error: null }
+        }
+        console.error('UPSERT 실패:', error)
+        return { data: null, error }
+      }
+      
+      const data = await response.json()
+      return { data, error: null }
+    } catch (error) {
+      console.error('UPSERT 오류:', error)
+      return { data: null, error }
+    }
+  },
+  
+  // IN 쿼리
+  deleteIn: async (table, column, values) => {
+    try {
+      const url = `${supabaseUrl}/rest/v1/${table}?${column}=in.(${values.join(',')})`
+      
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: getHeaders()
+      })
+      
+      if (!response.ok) {
+        const error = await response.json()
+        console.error('DELETE IN 실패:', error)
+        return { error }
+      }
+      
+      return { error: null }
+    } catch (error) {
+      console.error('DELETE IN 오류:', error)
+      return { error }
+    }
+  }
 }
 
-// Supabase 클라이언트를 지연 생성하여 에러 핸들러가 먼저 설정되도록 함
-let supabase = null
-let supabaseInitialized = false
-
-// Supabase 클라이언트 초기화 함수 (필요할 때만 호출)
-const initializeSupabase = () => {
-  if (supabaseInitialized) return
-  supabaseInitialized = true
-  
-  console.log('🔍 Supabase 초기화 시작...')
+// 초기화 시 설정 확인
+if (typeof window !== 'undefined') {
+  console.log('🔍 Supabase REST API 초기화...')
   console.log('📍 URL:', supabaseUrl || '(없음)')
   console.log('📍 Key:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : '(없음)')
   
-  if (!isSupabaseConfigured()) {
-    console.error('❌ Supabase가 설정되지 않았습니다. 환경 변수를 확인하세요.')
-    console.error('VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL ? '설정됨' : '없음')
-    console.error('VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? '설정됨' : '없음')
-    return
-  }
-  
-  console.log('⚙️ Auth를 완전히 비활성화하여 초기화합니다...')
-  
-  // Promise 에러를 완전히 차단하는 래퍼
-  const suppressedPromise = (promiseFactory) => {
-    try {
-      const promise = promiseFactory()
-      if (promise && typeof promise.catch === 'function') {
-        promise.catch((error) => {
-          const errorMsg = (error.message || error.toString() || '').toLowerCase()
-          if (errorMsg.includes('storage') || errorMsg.includes('localstorage')) {
-            // storage 관련 에러는 완전히 무시
-            return null
-          }
-          // 다른 에러는 다시 throw
-          throw error
-        })
-      }
-      return promise
-    } catch (error) {
-      const errorMsg = (error.message || error.toString() || '').toLowerCase()
-      if (errorMsg.includes('storage') || errorMsg.includes('localstorage')) {
-        return null
-      }
-      throw error
-    }
-  }
-  
-  try {
-    // localStorage를 완전히 우회하는 가짜 스토리지 사용
-    const fakeStorage = createFakeStorage()
-    
-    // Supabase 클라이언트 생성 전에 전역 에러 핸들러 추가
-    const originalFetch = window.fetch
-    
-    // Supabase 클라이언트 생성 - Auth 완전 비활성화
-    const createClientSafely = () => {
-      try {
-        // 최소한의 설정으로 클라이언트 생성 (auth 기능 완전 비활성화)
-        const client = createClient(supabaseUrl, supabaseAnonKey, {
-          auth: {
-            persistSession: false,
-            autoRefreshToken: false,
-            detectSessionInUrl: false,
-            storage: fakeStorage,
-            storageKey: 'supabase-auth-token-disabled',
-            flowType: 'implicit'
-          },
-          db: {
-            schema: 'public'
-          },
-          global: {
-            headers: {
-              'X-Client-Info': 'supabase-js-web'
-            }
-          }
-        })
-        
-        // auth 모듈을 완전히 무력화
-        if (client && client.auth) {
-          // getSession을 항상 null 세션을 반환하도록 오버라이드
-          client.auth.getSession = async () => {
-            return { data: { session: null }, error: null }
-          }
-          // 다른 auth 메서드들도 무력화
-          client.auth.getUser = async () => {
-            return { data: { user: null }, error: null }
-          }
-          client.auth.onAuthStateChange = () => {
-            return { data: { subscription: { unsubscribe: () => {} } } }
-          }
-        }
-        
-        console.log('✅ Auth 비활성화 완료 - 데이터 전용 클라이언트 생성 성공')
-        return client
-      } catch (innerError) {
-        const errorMsg = (innerError.message || innerError.toString() || '').toLowerCase()
-        if (!errorMsg.includes('storage')) {
-          console.warn('⚠️ createClient 내부 에러:', innerError)
-        }
-        return null
-      }
-    }
-    
-    supabase = createClientSafely()
-    
-    if (supabase) {
-      console.log('✅ Supabase 클라이언트가 생성되었습니다.')
-      console.log('📍 URL:', supabaseUrl)
-    } else {
-      console.warn('⚠️ Supabase 클라이언트 생성 실패 (null 반환)')
-    }
-  } catch (error) {
-    // 모든 에러를 무시하고 계속 진행
-    supabase = null
-    const errorMsg = (error.message || error.toString() || '').toLowerCase()
-    if (!errorMsg.includes('storage') && !errorMsg.includes('localstorage')) {
-      console.warn('⚠️ Supabase 클라이언트 생성 중 경고:', error.message || error)
-    }
+  if (isSupabaseConfigured()) {
+    console.log('✅ Supabase REST API 설정 완료!')
+  } else {
+    console.error('❌ Supabase가 설정되지 않았습니다.')
   }
 }
 
-// 앱 시작 시 초기화 (브라우저 환경에서만)
-if (typeof window !== 'undefined') {
-  initializeSupabase()
-}
-
-// supabase 접근 시 자동 초기화
-const getSupabase = () => {
-  if (!supabaseInitialized) {
-    initializeSupabase()
-  }
-  return supabase
-}
-
-export { supabase, getSupabase }
-
-// 연결 테스트 함수
-export const testConnection = async () => {
-  try {
-    const { data, error } = await supabase.from('tests').select('count').limit(1)
-    if (error) {
-      console.error('Supabase 연결 실패:', error)
-      return false
-    }
-    console.log('Supabase 연결 성공!')
-    return true
-  } catch (error) {
-    console.error('Supabase 연결 오류:', error)
-    return false
-  }
-}
-
+// 하위 호환성을 위해 supabase 객체 export (사용하지 않음)
+export const supabase = null
+export const getSupabase = () => null
