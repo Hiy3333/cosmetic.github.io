@@ -53,33 +53,48 @@ const createFakeStorage = () => {
   })
 }
 
-// Supabase 클라이언트 생성 (설정이 없으면 null 반환)
+// Supabase 클라이언트를 지연 생성하여 에러 핸들러가 먼저 설정되도록 함
 let supabase = null
-if (isSupabaseConfigured()) {
+let supabaseInitialized = false
+
+// Supabase 클라이언트 초기화 함수 (필요할 때만 호출)
+const initializeSupabase = () => {
+  if (supabaseInitialized) return
+  supabaseInitialized = true
+  
+  if (!isSupabaseConfigured()) {
+    console.warn('⚠️ Supabase가 설정되지 않았습니다.')
+    console.log('📍 URL:', supabaseUrl || '(없음)')
+    console.log('📍 Key:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : '(없음)')
+    return
+  }
+  
+  // Promise 에러를 완전히 차단하는 래퍼
+  const suppressedPromise = (promiseFactory) => {
+    try {
+      const promise = promiseFactory()
+      if (promise && typeof promise.catch === 'function') {
+        promise.catch((error) => {
+          const errorMsg = (error.message || error.toString() || '').toLowerCase()
+          if (errorMsg.includes('storage') || errorMsg.includes('localstorage')) {
+            // storage 관련 에러는 완전히 무시
+            return null
+          }
+          // 다른 에러는 다시 throw
+          throw error
+        })
+      }
+      return promise
+    } catch (error) {
+      const errorMsg = (error.message || error.toString() || '').toLowerCase()
+      if (errorMsg.includes('storage') || errorMsg.includes('localstorage')) {
+        return null
+      }
+      throw error
+    }
+  }
+  
   try {
-    // 에러를 완전히 무시하고 Supabase 클라이언트 생성
-    const originalConsoleError = console.error
-    const originalConsoleWarn = console.warn
-    
-    // Supabase 클라이언트 생성 중 발생하는 에러를 일시적으로 무시
-    console.error = function(...args) {
-      const message = args.join(' ')
-      if (message.toLowerCase().includes('storage') || 
-          message.toLowerCase().includes('localstorage')) {
-        return // storage 관련 에러는 무시
-      }
-      originalConsoleError.apply(console, args)
-    }
-    
-    console.warn = function(...args) {
-      const message = args.join(' ')
-      if (message.toLowerCase().includes('storage') || 
-          message.toLowerCase().includes('localstorage')) {
-        return // storage 관련 경고는 무시
-      }
-      originalConsoleWarn.apply(console, args)
-    }
-    
     // localStorage를 완전히 우회하는 가짜 스토리지 사용
     const fakeStorage = createFakeStorage()
     
@@ -90,40 +105,42 @@ if (isSupabaseConfigured()) {
         autoRefreshToken: false, // 토큰 자동 갱신 비활성화
         persistSession: false, // 세션 저장 안 함
         detectSessionInUrl: false, // URL에서 세션 감지 안 함
-        flowType: 'pkce' // PKCE 플로우 사용
+        flowType: 'implicit' // implicit 플로우 사용 (pkce보다 storage 사용 적음)
       },
       global: {
         headers: {}
       },
       db: {
         schema: 'public'
-      },
-      realtime: {
-        params: {
-          eventsPerSecond: 10
-        }
       }
     })
-    
-    // 콘솔 함수 복원
-    console.error = originalConsoleError
-    console.warn = originalConsoleWarn
     
     console.log('✅ Supabase 클라이언트가 생성되었습니다.')
     console.log('📍 URL:', supabaseUrl)
   } catch (error) {
     // 모든 에러를 무시하고 계속 진행
-    // 에러가 발생해도 null로 설정하여 앱이 계속 작동하도록 함
     supabase = null
-    console.warn('⚠️ Supabase 클라이언트 생성 중 경고 (앱은 계속 작동합니다):', error.message || error)
+    const errorMsg = (error.message || error.toString() || '').toLowerCase()
+    if (!errorMsg.includes('storage') && !errorMsg.includes('localstorage')) {
+      console.warn('⚠️ Supabase 클라이언트 생성 중 경고:', error.message || error)
+    }
   }
-} else {
-  console.warn('⚠️ Supabase가 설정되지 않았습니다.')
-  console.log('📍 URL:', supabaseUrl || '(없음)')
-  console.log('📍 Key:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : '(없음)')
 }
 
-export { supabase }
+// 앱 시작 시 초기화 (약간의 지연을 두고)
+setTimeout(() => {
+  initializeSupabase()
+}, 100)
+
+// supabase 접근 시 자동 초기화
+const getSupabase = () => {
+  if (!supabaseInitialized) {
+    initializeSupabase()
+  }
+  return supabase
+}
+
+export { supabase, getSupabase }
 
 // 연결 테스트 함수
 export const testConnection = async () => {
