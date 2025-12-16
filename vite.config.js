@@ -4,6 +4,8 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // GitHub Pages 배포를 위한 base 경로 설정
-  base: '/cosmetic.github.io/',
+  // 배포 환경에 따라 base 경로 설정
+  // Vercel: '/' (루트)
+  // GitHub Pages: '/cosmetic.github.io/'
+  base: process.env.VERCEL ? '/' : '/cosmetic.github.io/',
 })

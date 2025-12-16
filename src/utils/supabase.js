@@ -131,8 +131,10 @@ const initializeSupabase = () => {
   }
 }
 
-// 앱 시작 시 즉시 초기화
-initializeSupabase()
+// 앱 시작 시 초기화 (브라우저 환경에서만)
+if (typeof window !== 'undefined') {
+  initializeSupabase()
+}
 
 // supabase 접근 시 자동 초기화
 const getSupabase = () => {
