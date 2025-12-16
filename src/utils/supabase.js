@@ -14,12 +14,21 @@ export const isSupabaseConfigured = () => {
 }
 
 // REST API 기본 헤더
-const getHeaders = () => ({
-  'apikey': supabaseAnonKey,
-  'Authorization': `Bearer ${supabaseAnonKey}`,
-  'Content-Type': 'application/json',
-  'Prefer': 'return=representation'
-})
+const getHeaders = () => {
+  const headers = {
+    'apikey': supabaseAnonKey,
+    'Authorization': `Bearer ${supabaseAnonKey}`,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=representation'
+  }
+  
+  console.log('🔑 API 헤더:', {
+    apikey: supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : '없음',
+    Authorization: supabaseAnonKey ? 'Bearer ...' : '없음'
+  })
+  
+  return headers
+}
 
 // REST API 헬퍼 함수
 export const supabaseAPI = {
@@ -52,18 +61,30 @@ export const supabaseAPI = {
         url += `&limit=${limit}`
       }
       
+      console.log('📡 SELECT 요청:', url)
+      
       const response = await fetch(url, {
         method: 'GET',
-        headers: getHeaders()
+        headers: getHeaders(),
+        mode: 'cors',
+        credentials: 'omit'
       })
       
+      console.log('📥 SELECT 응답:', response.status, response.statusText)
+      
       if (!response.ok) {
-        const error = await response.json()
+        let error
+        try {
+          error = await response.json()
+        } catch (e) {
+          error = { message: response.statusText, status: response.status }
+        }
         console.error('SELECT 실패:', error)
         return { data: null, error }
       }
       
       const data = await response.json()
+      console.log('✅ SELECT 성공, 데이터 개수:', Array.isArray(data) ? data.length : 1)
       
       // single 모드면 첫 번째 항목만 반환
       if (single) {
@@ -73,6 +94,7 @@ export const supabaseAPI = {
       return { data, error: null }
     } catch (error) {
       console.error('SELECT 오류:', error)
+      console.error('오류 상세:', error.message, error.stack)
       return { data: null, error }
     }
   },
