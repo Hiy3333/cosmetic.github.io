@@ -247,70 +247,26 @@ function Step1Form({ formData, onNext }) {
       {/* 제조사명 선택 */}
       <div className="form-group">
         <label>OEM 제조사명 *</label>
-        <div className="dropdown-container">
-          <div
-            className="dropdown-input"
-            onClick={() => {
-              setShowManufacturerList(!showManufacturerList)
+        <select
+          value={manufacturer}
+          onChange={(e) => {
+            const value = e.target.value
+            if (value === '__add_new__') {
+              setShowAddManufacturer(true)
+            } else {
+              setManufacturer(value)
               setShowAddManufacturer(false)
-            }}
-          >
-            <span className="dropdown-text">{manufacturer || '제조사명을 선택하세요'}</span>
-            <div className="dropdown-actions">
-              {manufacturer && (
-                <span
-                  className="clear-btn"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setManufacturer('')
-                    setSkinType('')
-                    setPreviousUsageCount(0)
-                  }}
-                  title="선택 해제"
-                >
-                  ✕
-                </span>
-              )}
-              <span className="dropdown-arrow">▼</span>
-            </div>
-          </div>
-          {showManufacturerList && (
-            <div className="dropdown-list">
-              {manufacturers.map((mfr, index) => (
-                <div
-                  key={index}
-                  className="dropdown-item"
-                >
-                  <span
-                    onClick={() => {
-                      setManufacturer(mfr)
-                      setShowManufacturerList(false)
-                    }}
-                    className="dropdown-item-text"
-                  >
-                    {mfr}
-                  </span>
-                  <span
-                    className="delete-btn"
-                    onClick={(e) => handleDeleteManufacturer(mfr, index, e)}
-                    title="삭제"
-                  >
-                    ✕
-                  </span>
-                </div>
-              ))}
-              <div
-                className="dropdown-item add-item"
-                onClick={() => {
-                  setShowAddManufacturer(true)
-                  setShowManufacturerList(false)
-                }}
-              >
-                + 제조사 추가
-              </div>
-            </div>
-          )}
-        </div>
+            }
+          }}
+          className="form-select"
+          required
+        >
+          <option value="">제조사명을 선택하세요</option>
+          {manufacturers.map((mfr, index) => (
+            <option key={index} value={mfr}>{mfr}</option>
+          ))}
+          <option value="__add_new__">+ 제조사 추가</option>
+        </select>
         {showAddManufacturer && (
           <div className="add-manufacturer-form">
             <input
@@ -368,67 +324,26 @@ function Step1Form({ formData, onNext }) {
       {/* 작성자 */}
       <div className="form-group">
         <label>작성자 *</label>
-        <div className="dropdown-container">
-          <div
-            className="dropdown-input"
-            onClick={() => {
-              setShowAuthorList(!showAuthorList)
+        <select
+          value={author}
+          onChange={(e) => {
+            const value = e.target.value
+            if (value === '__add_new__') {
+              setShowAddAuthor(true)
+            } else {
+              handleAuthorSelect(value)
               setShowAddAuthor(false)
-            }}
-          >
-            <span className="dropdown-text">{author || '작성자를 선택하세요'}</span>
-            <div className="dropdown-actions">
-              {author && (
-                <span
-                  className="clear-btn"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    setAuthor('')
-                    setSkinType('')
-                    setPreviousUsageCount(0)
-                  }}
-                  title="선택 해제"
-                >
-                  ✕
-                </span>
-              )}
-              <span className="dropdown-arrow">▼</span>
-            </div>
-          </div>
-          {showAuthorList && (
-            <div className="dropdown-list">
-              {authors.map((auth, index) => (
-                <div
-                  key={index}
-                  className="dropdown-item"
-                >
-                  <span
-                    onClick={() => handleAuthorSelect(auth)}
-                    className="dropdown-item-text"
-                  >
-                    {auth}
-                  </span>
-                  <span
-                    className="delete-btn"
-                    onClick={(e) => handleDeleteAuthor(auth, index, e)}
-                    title="삭제"
-                  >
-                    ✕
-                  </span>
-                </div>
-              ))}
-              <div
-                className="dropdown-item add-item"
-                onClick={() => {
-                  setShowAddAuthor(true)
-                  setShowAuthorList(false)
-                }}
-              >
-                + 작성자 추가
-              </div>
-            </div>
-          )}
-        </div>
+            }
+          }}
+          className="form-select"
+          required
+        >
+          <option value="">작성자를 선택하세요</option>
+          {authors.map((auth, index) => (
+            <option key={index} value={auth}>{auth}</option>
+          ))}
+          <option value="__add_new__">+ 작성자 추가</option>
+        </select>
         {showAddAuthor && (
           <div className="add-manufacturer-form">
             <input
@@ -489,31 +404,17 @@ function Step1Form({ formData, onNext }) {
       {/* 피부타입 */}
       <div className="form-group">
         <label>피부타입 *</label>
-        <div className="dropdown-container">
-          <div
-            className="dropdown-input"
-            onClick={() => setShowSkinTypeList(!showSkinTypeList)}
-          >
-            {skinType || '피부타입을 선택하세요'}
-            <span className="dropdown-arrow">▼</span>
-          </div>
-          {showSkinTypeList && (
-            <div className="dropdown-list">
-              {skinTypes.map((type, index) => (
-                <div
-                  key={index}
-                  className="dropdown-item"
-                  onClick={() => {
-                    setSkinType(type)
-                    setShowSkinTypeList(false)
-                  }}
-                >
-                  {type}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <select
+          value={skinType}
+          onChange={(e) => setSkinType(e.target.value)}
+          className="form-select"
+          required
+        >
+          <option value="">피부타입을 선택하세요</option>
+          {skinTypes.map((type, index) => (
+            <option key={index} value={type}>{type}</option>
+          ))}
+        </select>
       </div>
 
       {/* 다음 버튼 */}
