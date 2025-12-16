@@ -302,19 +302,25 @@
 @media (max-width: 768px) {
   .step1-form {
     gap: 20px;
+    overflow-x: hidden; /* 좌우 스크롤 방지 */
   }
 
   .form-group {
     gap: 6px;
+    width: 100%;
+    overflow-x: hidden; /* 좌우 스크롤 방지 */
   }
 
   .form-group label {
     font-size: 0.9rem;
+    word-break: keep-all;
   }
 
   .form-input {
     padding: 12px 15px;
     font-size: 0.95rem;
+    width: 100%;
+    max-width: 100%;
   }
 
   .dropdown-input {
@@ -322,8 +328,13 @@
     font-size: 0.95rem;
   }
 
+  .dropdown-list {
+    max-width: 100%;
+  }
+
   .input-wrapper {
     flex-wrap: wrap;
+    width: 100%;
   }
 
   .input-prefix,
@@ -342,6 +353,7 @@
     padding: 14px 24px;
     font-size: 1rem;
     margin-top: 20px;
+    width: 100%;
   }
 
   .add-manufacturer-form {
@@ -351,6 +363,7 @@
   .add-input {
     padding: 8px 10px;
     font-size: 0.9rem;
+    width: 100%;
   }
 
   .add-buttons {

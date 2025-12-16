@@ -240,12 +240,15 @@
 /* 모바일 반응형 스타일 (통계 페이지만) */
 @media (max-width: 768px) {
   .statistics {
-    padding: 15px;
+    padding: 10px;
+    overflow-x: hidden; /* 좌우 스크롤 방지 */
+    max-width: 100vw;
   }
 
   .statistics-title {
-    font-size: 1.8rem;
-    margin-bottom: 25px;
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    word-break: keep-all;
   }
 
   .author-selector,
@@ -254,65 +257,115 @@
     align-items: flex-start;
     gap: 10px;
     padding: 15px;
+    overflow-x: hidden; /* 좌우 스크롤 방지 */
   }
 
   .author-selector label,
   .manufacturer-selector label {
     font-size: 0.9rem;
-    writing-mode: horizontal-tb;
-    text-orientation: mixed;
     width: 100%;
+    word-break: keep-all;
   }
 
   .author-select,
   .manufacturer-select {
     width: 100%;
     min-width: auto;
+    max-width: 100%;
     padding: 10px 15px;
     font-size: 0.95rem;
   }
 
   .statistics-summary {
     grid-template-columns: 1fr;
-    gap: 15px;
+    gap: 12px;
     margin-bottom: 20px;
   }
 
   .summary-card {
-    padding: 20px;
+    padding: 18px;
   }
 
   .summary-value {
-    font-size: 1.6rem;
+    font-size: 1.5rem;
   }
 
   .calendar-section,
   .chart-section,
   .test-items-section {
-    padding: 20px 15px;
-    margin-bottom: 25px;
+    padding: 15px 10px;
+    margin-bottom: 20px;
+    overflow-x: hidden; /* 좌우 스크롤 방지 */
   }
 
   .section-title {
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    word-break: keep-all;
   }
 
   .today-score-display {
-    padding: 12px 15px;
-    margin-top: 15px;
+    padding: 10px 12px;
+    margin-top: 12px;
   }
 
   .today-score-label {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     display: block;
     margin-bottom: 5px;
     margin-right: 0;
   }
 
   .today-score-value {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
+  }
+  
+  .test-items-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .test-item-card {
+    padding: 15px 12px;
+  }
+
+  .test-item-card-name {
+    font-size: 0.85rem;
+    word-break: keep-all;
+    line-height: 1.3;
+  }
+
+  .test-item-card-arrow {
+    font-size: 1rem;
+  }
+
+  .item-chart-modal-overlay {
+    padding: 10px;
+  }
+
+  .item-chart-modal-content {
+    max-height: 95vh;
+    overflow-x: hidden; /* 좌우 스크롤 방지 */
+  }
+
+  .item-chart-modal-header {
+    padding: 15px 12px;
+  }
+
+  .item-chart-modal-title {
+    font-size: 1.3rem;
+    word-break: keep-all;
+  }
+
+  .item-chart-modal-close {
+    font-size: 1.5rem;
+    padding: 6px 10px;
+  }
+
+  .item-chart-modal-body {
+    padding: 15px 10px;
+    overflow-x: hidden; /* 좌우 스크롤 방지 */
   }
 }
 

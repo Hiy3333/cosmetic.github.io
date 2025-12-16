@@ -1,53 +1,31 @@
-// Supabase REST API를 사용한 데이터 저장/불러오기 유틸리티
-import { supabaseAPI, isSupabaseConfigured } from './supabase'
+// Supabase를 사용한 데이터 저장/불러오기 유틸리티
+import { supabase } from './supabase'
 
 // ==================== 테스트 데이터 관련 함수 ====================
 
 // 테스트 데이터 저장
 export const saveTestData = async (formData) => {
   try {
-    // Supabase가 설정되지 않았으면 에러
-    if (!isSupabaseConfigured()) {
-      console.error('❌ Supabase가 설정되지 않았습니다. 데이터를 저장할 수 없습니다.')
-      return null
-    }
+    const today = new Date().toISOString().split('T')[0]
     
-    // formData에서 날짜 가져오기 (없으면 오늘 날짜)
-    const testDate = formData.testDate || new Date().toISOString().split('T')[0]
-    const timeSlot = formData.timeSlot || ''
+    // 중복 체크: 같은 날짜, 작성자, 제조사, 샘플 넘버, 회차의 테스트가 이미 있는지 확인
+    const { data: existingTests, error: checkError } = await supabase
+      .from('tests')
+      .select('*')
+      .eq('date', today)
+      .eq('author', formData.author)
+      .eq('manufacturer', formData.manufacturer)
+      .eq('sample_number', formData.sampleNumber)
+      .eq('usage_count', formData.usageCount)
     
-    // 날짜 형식 확인 및 정규화 (YYYY-MM-DD)
-    console.log('저장할 날짜 (원본):', formData.testDate)
-    console.log('저장할 날짜 (정규화):', testDate)
-    
-    // 중복 체크: 같은 날짜, 시간대, 작성자, 제조사, 샘플 넘버, 회차의 테스트가 이미 있는지 확인
-    let existingTests = []
-    try {
-      const { data, error: checkError } = await supabaseAPI.select('tests', {
-        eq: {
-          date: testDate,
-          author: formData.author,
-          manufacturer: formData.manufacturer,
-          sample_number: formData.sampleNumber,
-          usage_count: formData.usageCount,
-          time_slot: timeSlot
-        }
-      })
-      
-      if (checkError) {
-        console.error('중복 체크 실패:', checkError)
-        existingTests = []
-      } else {
-        existingTests = data || []
-      }
-    } catch (error) {
-      console.error('중복 체크 중 예외 발생:', error)
-      existingTests = []
+    if (checkError) {
+      console.error('중복 체크 실패:', checkError)
+      // 에러가 나도 계속 진행 (중복 체크 실패는 치명적이지 않음)
     }
     
     // 중복이면 저장하지 않음
     if (existingTests && existingTests.length > 0) {
-      console.log('중복된 테스트 데이터가 있어 저장하지 않습니다. 기존 데이터:', existingTests)
+      console.log('중복된 테스트 데이터가 있어 저장하지 않습니다.')
       return null
     }
     
@@ -60,32 +38,27 @@ export const saveTestData = async (formData) => {
       : 0
     
     // Supabase에 저장
-    const insertData = {
-      date: testDate,
-      time_slot: timeSlot,
-      manufacturer: formData.manufacturer,
-      sample_number: formData.sampleNumber,
-      author: formData.author,
-      usage_count: formData.usageCount,
-      skin_type: formData.skinType,
-      scores: scores,
-      improvement: formData.improvement || '',
-      total_score: totalScore,
-      average_score: parseFloat(averageScore)
-    }
-    
-    console.log('저장할 데이터:', insertData)
-    
-    const { data, error } = await supabaseAPI.insert('tests', [insertData], { single: true })
+    const { data, error } = await supabase
+      .from('tests')
+      .insert([
+        {
+          date: today,
+          manufacturer: formData.manufacturer,
+          sample_number: formData.sampleNumber,
+          author: formData.author,
+          usage_count: formData.usageCount,
+          skin_type: formData.skinType,
+          scores: scores,
+          improvement: formData.improvement || '',
+          total_score: totalScore,
+          average_score: parseFloat(averageScore)
+        }
+      ])
+      .select()
+      .single()
     
     if (error) {
       console.error('데이터 저장 실패:', error)
-      console.error('에러 상세:', JSON.stringify(error, null, 2))
-      return null
-    }
-    
-    if (!data) {
-      console.error('데이터 저장 실패: 반환된 데이터가 없습니다.')
       return null
     }
     
@@ -112,15 +85,10 @@ export const saveTestData = async (formData) => {
 // 모든 테스트 데이터 불러오기
 export const getTestData = async () => {
   try {
-    // Supabase가 설정되지 않았으면 빈 배열 반환
-    if (!isSupabaseConfigured()) {
-      console.error('❌ Supabase가 설정되지 않았습니다. 데이터를 불러올 수 없습니다.')
-      return []
-    }
-    
-    const { data, error } = await supabaseAPI.select('tests', {
-      order: { column: 'date', ascending: false }
-    })
+    const { data, error } = await supabase
+      .from('tests')
+      .select('*')
+      .order('date', { ascending: false })
     
     if (error) {
       console.error('데이터 불러오기 실패:', error)
@@ -128,10 +96,9 @@ export const getTestData = async () => {
     }
     
     // 반환 형식을 기존과 동일하게 맞춤
-    const mappedData = (data || []).map(test => ({
+    return (data || []).map(test => ({
       id: test.id,
-      date: test.date, // 날짜 형식 그대로 유지 (YYYY-MM-DD)
-      timeSlot: test.time_slot || '',
+      date: test.date,
       manufacturer: test.manufacturer,
       sampleNumber: test.sample_number,
       author: test.author,
@@ -142,9 +109,6 @@ export const getTestData = async () => {
       totalScore: test.total_score,
       averageScore: test.average_score
     }))
-    
-    console.log('불러온 테스트 데이터 날짜 목록:', [...new Set(mappedData.map(t => t.date))])
-    return mappedData
   } catch (error) {
     console.error('데이터 불러오기 실패:', error)
     return []
@@ -179,13 +143,10 @@ export const getAllManufacturers = async () => {
 // 테스트 데이터 삭제
 export const deleteTestData = async (id) => {
   try {
-    // Supabase가 설정되지 않았으면 false 반환
-    if (!isSupabaseConfigured()) {
-      console.error('❌ Supabase가 설정되지 않았습니다. 데이터를 삭제할 수 없습니다.')
-      return false
-    }
-    
-    const { error } = await supabaseAPI.delete('tests', { id })
+    const { error } = await supabase
+      .from('tests')
+      .delete()
+      .eq('id', id)
     
     if (error) {
       console.error('데이터 삭제 실패:', error)
@@ -204,19 +165,14 @@ export const deleteTestData = async (id) => {
 // 제조사 목록 불러오기
 export const getManufacturers = async () => {
   try {
-    // Supabase가 설정되지 않았으면 기본값 반환
-    if (!isSupabaseConfigured()) {
-      console.error('❌ Supabase가 설정되지 않았습니다. 기본 제조사 목록을 사용합니다.')
-      return ['제조사 A', '제조사 B', '제조사 C', '제조사 D']
-    }
-    
-    const { data, error } = await supabaseAPI.select('manufacturers', {
-      select: 'name',
-      order: { column: 'name', ascending: true }
-    })
+    const { data, error } = await supabase
+      .from('manufacturers')
+      .select('name')
+      .order('name', { ascending: true })
     
     if (error) {
       console.error('제조사 목록 불러오기 실패:', error)
+      // 기본값 반환
       return ['제조사 A', '제조사 B', '제조사 C', '제조사 D']
     }
     
@@ -236,16 +192,10 @@ export const getManufacturers = async () => {
 // 제조사 목록 저장
 export const saveManufacturers = async (manufacturers) => {
   try {
-    // Supabase가 설정되지 않았으면 false 반환
-    if (!isSupabaseConfigured()) {
-      console.error('❌ Supabase가 설정되지 않았습니다. 제조사 목록을 저장할 수 없습니다.')
-      return false
-    }
-    
     // 기존 제조사 목록 가져오기
-    const { data: existing } = await supabaseAPI.select('manufacturers', {
-      select: 'id,name'
-    })
+    const { data: existing } = await supabase
+      .from('manufacturers')
+      .select('id, name')
     
     const existingNames = (existing || []).map(m => m.name)
     const existingIds = (existing || []).reduce((acc, m) => {
@@ -263,7 +213,10 @@ export const saveManufacturers = async (manufacturers) => {
     if (toDelete.length > 0) {
       const idsToDelete = toDelete.map(name => existingIds[name]).filter(Boolean)
       if (idsToDelete.length > 0) {
-        const { error } = await supabaseAPI.deleteIn('manufacturers', 'id', idsToDelete)
+        const { error } = await supabase
+          .from('manufacturers')
+          .delete()
+          .in('id', idsToDelete)
         
         if (error) {
           console.error('제조사 삭제 실패:', error)
@@ -274,19 +227,13 @@ export const saveManufacturers = async (manufacturers) => {
     
     // 새로 추가할 제조사가 있으면 추가
     if (toAdd.length > 0) {
-      // UNIQUE 제약 조건을 피하기 위해 upsert 사용
-      const { error } = await supabaseAPI.upsert(
-        'manufacturers',
-        toAdd.map(name => ({ name })), 
-        { onConflict: 'name' }
-      )
+      const { error } = await supabase
+        .from('manufacturers')
+        .insert(toAdd.map(name => ({ name })))
       
       if (error) {
         console.error('제조사 목록 저장 실패:', error)
-        // 409 에러는 중복 데이터일 수 있으므로 무시하고 계속 진행
-        if (error.code !== '23505') { // UNIQUE 제약 조건 에러가 아니면
-          return false
-        }
+        return false
       }
     }
     
@@ -302,16 +249,10 @@ export const saveManufacturers = async (manufacturers) => {
 // 작성자 목록 불러오기
 export const getAuthors = async () => {
   try {
-    // Supabase가 설정되지 않았으면 빈 배열 반환
-    if (!isSupabaseConfigured()) {
-      console.error('❌ Supabase가 설정되지 않았습니다. 작성자 목록을 불러올 수 없습니다.')
-      return []
-    }
-    
-    const { data, error } = await supabaseAPI.select('authors', {
-      select: 'name',
-      order: { column: 'name', ascending: true }
-    })
+    const { data, error } = await supabase
+      .from('authors')
+      .select('name')
+      .order('name', { ascending: true })
     
     if (error) {
       console.error('작성자 목록 불러오기 실패:', error)
@@ -328,16 +269,10 @@ export const getAuthors = async () => {
 // 작성자 목록 저장
 export const saveAuthors = async (authors) => {
   try {
-    // Supabase가 설정되지 않았으면 false 반환
-    if (!isSupabaseConfigured()) {
-      console.error('❌ Supabase가 설정되지 않았습니다. 작성자 목록을 저장할 수 없습니다.')
-      return false
-    }
-    
     // 기존 작성자 목록 가져오기
-    const { data: existing } = await supabaseAPI.select('authors', {
-      select: 'id,name'
-    })
+    const { data: existing } = await supabase
+      .from('authors')
+      .select('id, name')
     
     const existingNames = (existing || []).map(a => a.name)
     const existingIds = (existing || []).reduce((acc, a) => {
@@ -355,7 +290,10 @@ export const saveAuthors = async (authors) => {
     if (toDelete.length > 0) {
       const idsToDelete = toDelete.map(name => existingIds[name]).filter(Boolean)
       if (idsToDelete.length > 0) {
-        const { error } = await supabaseAPI.deleteIn('authors', 'id', idsToDelete)
+        const { error } = await supabase
+          .from('authors')
+          .delete()
+          .in('id', idsToDelete)
         
         if (error) {
           console.error('작성자 삭제 실패:', error)
@@ -366,19 +304,13 @@ export const saveAuthors = async (authors) => {
     
     // 새로 추가할 작성자가 있으면 추가
     if (toAdd.length > 0) {
-      // UNIQUE 제약 조건을 피하기 위해 upsert 사용
-      const { error } = await supabaseAPI.upsert(
-        'authors',
-        toAdd.map(name => ({ name })), 
-        { onConflict: 'name' }
-      )
+      const { error } = await supabase
+        .from('authors')
+        .insert(toAdd.map(name => ({ name })))
       
       if (error) {
         console.error('작성자 목록 저장 실패:', error)
-        // 409 에러는 중복 데이터일 수 있으므로 무시하고 계속 진행
-        if (error.code !== '23505') { // UNIQUE 제약 조건 에러가 아니면
-          return false
-        }
+        return false
       }
     }
     
@@ -456,23 +388,72 @@ export const getAllAuthors = async () => {
 }
 
 // ==================== 실시간 동기화 함수 ====================
-// 참고: REST API는 실시간 구독을 지원하지 않습니다.
-// 실시간 기능이 필요한 경우 수동 폴링 또는 WebSocket을 구현해야 합니다.
 
-// 테스트 데이터 실시간 구독 (빈 함수)
+// 테스트 데이터 실시간 구독
 export const subscribeToTests = (callback) => {
-  console.log('⚠️ REST API 모드에서는 실시간 구독이 지원되지 않습니다.')
-  return () => {}
+  const channel = supabase
+    .channel('tests-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*', // INSERT, UPDATE, DELETE 모두 감지
+        schema: 'public',
+        table: 'tests'
+      },
+      (payload) => {
+        console.log('테스트 데이터 변경 감지:', payload)
+        callback(payload)
+      }
+    )
+    .subscribe()
+  
+  return () => {
+    supabase.removeChannel(channel)
+  }
 }
 
-// 제조사 목록 실시간 구독 (빈 함수)
+// 제조사 목록 실시간 구독
 export const subscribeToManufacturers = (callback) => {
-  console.log('⚠️ REST API 모드에서는 실시간 구독이 지원되지 않습니다.')
-  return () => {}
+  const channel = supabase
+    .channel('manufacturers-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'manufacturers'
+      },
+      (payload) => {
+        console.log('제조사 목록 변경 감지:', payload)
+        callback(payload)
+      }
+    )
+    .subscribe()
+  
+  return () => {
+    supabase.removeChannel(channel)
+  }
 }
 
-// 작성자 목록 실시간 구독 (빈 함수)
+// 작성자 목록 실시간 구독
 export const subscribeToAuthors = (callback) => {
-  console.log('⚠️ REST API 모드에서는 실시간 구독이 지원되지 않습니다.')
-  return () => {}
+  const channel = supabase
+    .channel('authors-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'authors'
+      },
+      (payload) => {
+        console.log('작성자 목록 변경 감지:', payload)
+        callback(payload)
+      }
+    )
+    .subscribe()
+  
+  return () => {
+    supabase.removeChannel(channel)
+  }
 }

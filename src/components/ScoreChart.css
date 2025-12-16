@@ -2,6 +2,123 @@
   padding: 20px;
 }
 
+/* 모바일 반응형 스타일 */
+@media (max-width: 768px) {
+  .score-chart {
+    padding: 10px;
+    overflow-x: hidden; /* 좌우 스크롤 방지 */
+    max-width: 100%;
+  }
+
+  .chart-empty {
+    padding: 30px 15px;
+    font-size: 0.9rem;
+  }
+
+  .chart-week-navigation {
+    gap: 12px;
+    padding: 8px;
+    margin-bottom: 15px;
+    flex-wrap: nowrap;
+  }
+
+  .chart-nav-button {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .chart-week-info {
+    font-size: 0.85rem;
+    min-width: auto;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chart-container {
+    gap: 10px;
+    min-height: 300px;
+    padding: 10px 0;
+    overflow-x: auto; /* 차트 내부는 스크롤 가능 */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .chart-bars-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .chart-bars {
+    gap: 10px;
+    height: 260px;
+    padding-bottom: 40px;
+    min-width: max-content; /* 차트가 잘리지 않도록 */
+  }
+
+  .chart-bar-wrapper {
+    min-width: 50px;
+  }
+
+  .chart-bar-container {
+    height: 260px;
+    padding-top: 25px;
+  }
+
+  .chart-bar {
+    max-width: 40px;
+  }
+
+  .chart-bar-value {
+    font-size: 0.7rem;
+  }
+
+  .chart-bar-label {
+    font-size: 0.75rem;
+  }
+
+  .chart-date {
+    font-size: 0.75rem;
+  }
+
+  .chart-day {
+    font-size: 0.7rem;
+  }
+
+  .chart-score {
+    font-size: 0.75rem;
+  }
+
+  .chart-legend {
+    gap: 10px;
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+
+  .chart-legend-item {
+    gap: 6px;
+  }
+
+  .chart-legend-color {
+    width: 16px;
+    height: 16px;
+  }
+
+  .chart-legend-label {
+    font-size: 0.8rem;
+  }
+
+  .chart-bar-manufacturer-name {
+    font-size: 0.65rem;
+  }
+
+  .chart-bar-usage {
+    font-size: 0.6rem;
+  }
+}
+
 .chart-empty {
   text-align: center;
   padding: 40px;
