@@ -68,37 +68,38 @@
           // 이미 정의되어 있으면 무시
         }
         
-        // window.onerror로 동기 에러 처리
+        // window.onerror로 동기 에러 처리 - storage 관련만 정확히 필터링
         const originalOnError = window.onerror;
         window.onerror = function(message, source, lineno, colno, error) {
           if (message && typeof message === 'string') {
             const msg = message.toLowerCase();
+            // storage 관련 에러만 정확히 필터링
             if (
-              msg.includes('storage') ||
-              msg.includes('localstorage') ||
-              msg.includes('sessionstorage') ||
+              msg.includes('storage is not allowed') ||
               msg.includes('access to storage') ||
-              msg.includes('from this context')
+              (msg.includes('localstorage') && msg.includes('not allowed')) ||
+              (msg.includes('from this context') && msg.includes('storage'))
             ) {
-              return true; // 에러 무시
+              return true; // storage 관련 에러만 무시
             }
           }
+          // 다른 에러는 표시됨
           if (originalOnError) {
             return originalOnError.call(this, message, source, lineno, colno, error);
           }
           return false;
         };
         
-        // error 이벤트 리스너로 에러 처리
+        // error 이벤트 리스너로 에러 처리 - storage 관련만 필터링
         window.addEventListener('error', function(event) {
           if (event.message) {
             const msg = event.message.toLowerCase();
+            // storage 관련 에러만 정확히 필터링
             if (
-              msg.includes('storage') ||
-              msg.includes('localstorage') ||
-              msg.includes('sessionstorage') ||
+              msg.includes('storage is not allowed') ||
               msg.includes('access to storage') ||
-              msg.includes('from this context')
+              (msg.includes('localstorage') && msg.includes('not allowed')) ||
+              (msg.includes('from this context') && msg.includes('storage'))
             ) {
               event.preventDefault();
               event.stopPropagation();
@@ -106,19 +107,20 @@
               return false;
             }
           }
+          // 다른 에러는 표시됨
         }, true);
         
-        // Promise rejection 처리
+        // Promise rejection 처리 - storage 관련만 필터링
         window.addEventListener('unhandledrejection', function(event) {
           const reason = event.reason;
           if (reason) {
             const errorMessage = (reason.message || reason.toString() || '').toLowerCase();
+            // storage 관련 에러만 정확히 필터링
             if (
-              errorMessage.includes('storage') ||
-              errorMessage.includes('localstorage') ||
-              errorMessage.includes('sessionstorage') ||
+              errorMessage.includes('storage is not allowed') ||
               errorMessage.includes('access to storage') ||
-              errorMessage.includes('from this context')
+              (errorMessage.includes('localstorage') && errorMessage.includes('not allowed')) ||
+              (errorMessage.includes('from this context') && errorMessage.includes('storage'))
             ) {
               event.preventDefault();
               event.stopPropagation();
@@ -126,6 +128,7 @@
               return false;
             }
           }
+          // 다른 에러는 표시됨
         }, true);
       })();
     </script>
