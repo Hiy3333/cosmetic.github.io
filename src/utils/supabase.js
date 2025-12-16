@@ -16,39 +16,52 @@ export const isSupabaseConfigured = () => {
 
 // 완전히 안전한 가짜 스토리지 객체 생성 (모든 메서드 구현)
 const createFakeStorage = () => {
+  const noop = function() { return null }
+  const noopAsync = function() { return Promise.resolve(null) }
+  
   const storage = {
-    getItem: function(key) {
-      try {
-        return null
-      } catch (e) {
-        return null
-      }
-    },
-    setItem: function(key, value) {
-      // 아무것도 하지 않음
-    },
-    removeItem: function(key) {
-      // 아무것도 하지 않음
-    },
-    clear: function() {
-      // 아무것도 하지 않음
-    },
-    length: 0,
-    key: function(index) {
-      return null
-    }
+    getItem: noop,
+    setItem: noop,
+    removeItem: noop,
+    clear: noop,
+    key: noop,
+    length: 0
   }
   
-  // Proxy를 사용하여 모든 접근을 차단
+  // Proxy를 사용하여 모든 접근을 차단하고 에러 발생 방지
   return new Proxy(storage, {
     get: function(target, prop) {
+      // 존재하는 메서드 반환
       if (prop in target) {
         return target[prop]
       }
-      return function() { return null }
+      // 알려진 async 메서드들
+      if (prop === 'then' || prop === 'catch' || prop === 'finally') {
+        return undefined // Promise가 아님을 명시
+      }
+      // 다른 모든 메서드는 noop 반환
+      return noop
     },
-    set: function() {
-      return true // 모든 설정 시도 무시
+    set: function(target, prop, value) {
+      // 모든 설정 시도를 조용히 무시하고 성공으로 반환
+      return true
+    },
+    has: function(target, prop) {
+      return prop in target
+    },
+    ownKeys: function() {
+      return ['getItem', 'setItem', 'removeItem', 'clear', 'key', 'length']
+    },
+    getOwnPropertyDescriptor: function(target, prop) {
+      if (prop in target) {
+        return {
+          enumerable: true,
+          configurable: true,
+          writable: true,
+          value: target[prop]
+        }
+      }
+      return undefined
     }
   })
 }
@@ -102,25 +115,41 @@ const initializeSupabase = () => {
     // localStorage를 완전히 우회하는 가짜 스토리지 사용
     const fakeStorage = createFakeStorage()
     
-    // Supabase 클라이언트 생성 (에러가 발생해도 계속 진행)
-    supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        storage: fakeStorage, // localStorage 대신 가짜 스토리지 사용
-        autoRefreshToken: false, // 토큰 자동 갱신 비활성화
-        persistSession: false, // 세션 저장 안 함
-        detectSessionInUrl: false, // URL에서 세션 감지 안 함
-        flowType: 'implicit' // implicit 플로우 사용 (pkce보다 storage 사용 적음)
-      },
-      global: {
-        headers: {}
-      },
-      db: {
-        schema: 'public'
+    // Supabase 클라이언트 생성을 Promise로 감싸서 에러를 조용히 처리
+    const createClientSafely = () => {
+      try {
+        return createClient(supabaseUrl, supabaseAnonKey, {
+          auth: {
+            storage: fakeStorage, // localStorage 대신 가짜 스토리지 사용
+            autoRefreshToken: false, // 토큰 자동 갱신 비활성화
+            persistSession: false, // 세션 저장 안 함
+            detectSessionInUrl: false, // URL에서 세션 감지 안 함
+            flowType: 'implicit' // implicit 플로우 사용 (pkce보다 storage 사용 적음)
+          },
+          global: {
+            headers: {}
+          },
+          db: {
+            schema: 'public'
+          }
+        })
+      } catch (innerError) {
+        const errorMsg = (innerError.message || innerError.toString() || '').toLowerCase()
+        if (!errorMsg.includes('storage')) {
+          console.warn('⚠️ createClient 내부 에러:', innerError)
+        }
+        return null
       }
-    })
+    }
     
-    console.log('✅ Supabase 클라이언트가 생성되었습니다.')
-    console.log('📍 URL:', supabaseUrl)
+    supabase = createClientSafely()
+    
+    if (supabase) {
+      console.log('✅ Supabase 클라이언트가 생성되었습니다.')
+      console.log('📍 URL:', supabaseUrl)
+    } else {
+      console.warn('⚠️ Supabase 클라이언트 생성 실패 (null 반환)')
+    }
   } catch (error) {
     // 모든 에러를 무시하고 계속 진행
     supabase = null

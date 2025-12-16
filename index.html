@@ -110,25 +110,47 @@
           // 다른 에러는 표시됨
         }, true);
         
-        // Promise rejection 처리 - storage 관련만 필터링
+        // Promise rejection 처리 - storage 관련만 필터링 (더 강력하게)
         window.addEventListener('unhandledrejection', function(event) {
+          if (!event || !event.reason) {
+            return;
+          }
+          
           const reason = event.reason;
-          if (reason) {
-            const errorMessage = (reason.message || reason.toString() || '').toLowerCase();
-            // storage 관련 에러만 정확히 필터링
-            if (
-              errorMessage.includes('storage is not allowed') ||
-              errorMessage.includes('access to storage') ||
-              (errorMessage.includes('localstorage') && errorMessage.includes('not allowed')) ||
-              (errorMessage.includes('from this context') && errorMessage.includes('storage'))
-            ) {
-              event.preventDefault();
-              event.stopPropagation();
-              event.stopImmediatePropagation();
-              return false;
+          let errorMessage = '';
+          
+          try {
+            if (reason && typeof reason === 'object') {
+              errorMessage = (reason.message || reason.toString() || '').toLowerCase();
+            } else if (typeof reason === 'string') {
+              errorMessage = reason.toLowerCase();
             }
+          } catch (e) {
+            // 에러 메시지 추출 실패 시 무시
+            return;
+          }
+          
+          // storage 관련 에러만 정확히 필터링
+          if (
+            errorMessage.includes('storage is not allowed') ||
+            errorMessage.includes('access to storage') ||
+            errorMessage.includes('not allowed from this context') ||
+            (errorMessage.includes('localstorage') && errorMessage.includes('not allowed')) ||
+            (errorMessage.includes('sessionstorage') && errorMessage.includes('not allowed')) ||
+            (errorMessage.includes('from this context') && errorMessage.includes('storage'))
+          ) {
+            // 완전히 차단
+            if (event.preventDefault) event.preventDefault();
+            if (event.stopPropagation) event.stopPropagation();
+            if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+            return true;
           }
           // 다른 에러는 표시됨
+        }, true);
+        
+        // rejectionhandled 이벤트도 처리
+        window.addEventListener('rejectionhandled', function(event) {
+          // 이미 처리된 rejection도 무시
         }, true);
       })();
     </script>
