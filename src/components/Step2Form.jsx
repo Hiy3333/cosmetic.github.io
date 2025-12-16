@@ -263,13 +263,13 @@ function Step2Form({ onNext, onBack }) {
                     { label: '매우 없다', score: 5 }
                   ]
                 } else if (item === '흡수 후 잔감') {
-                  // 흡수 후 잔감 - 숫자로 표시
+                  // 흡수 후 잔감 - 점수로 표시
                   options = [
-                    { label: '1', score: 1 },
-                    { label: '2', score: 2 },
-                    { label: '3', score: 3 },
-                    { label: '4', score: 4 },
-                    { label: '5', score: 5 }
+                    { label: '1점', score: 1 },
+                    { label: '2점', score: 2 },
+                    { label: '3점', score: 3 },
+                    { label: '4점', score: 4 },
+                    { label: '5점', score: 5 }
                   ]
                 } else if (item === '롤링감(뭉침)' || item === '따가움' || item === '가려움' || item === '홍반' || item === '열감' || item === '트러블') {
                   // 부정적 특성 항목들
