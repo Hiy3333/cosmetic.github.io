@@ -7,34 +7,59 @@
     <script>
       // localStorage 접근 에러를 완전히 억제 (스크립트 로드 전에 실행)
       (function() {
-        // 에러 핸들러 설정
+        'use strict';
+        
+        // window.onerror로 동기 에러 처리
+        const originalOnError = window.onerror;
+        window.onerror = function(message, source, lineno, colno, error) {
+          if (message && typeof message === 'string' && (
+            message.includes('storage is not allowed') ||
+            message.includes('Access to storage') ||
+            message.includes('localStorage') ||
+            message.includes('Storage') ||
+            message.toLowerCase().includes('storage')
+          )) {
+            return true; // 에러 무시
+          }
+          if (originalOnError) {
+            return originalOnError.call(this, message, source, lineno, colno, error);
+          }
+          return false;
+        };
+        
+        // error 이벤트 리스너로 에러 처리
         window.addEventListener('error', function(event) {
           if (event.message && (
             event.message.includes('storage is not allowed') ||
             event.message.includes('Access to storage') ||
-            event.message.includes('localStorage')
+            event.message.includes('localStorage') ||
+            event.message.includes('Storage') ||
+            event.message.toLowerCase().includes('storage')
           )) {
             event.preventDefault();
             event.stopPropagation();
+            event.stopImmediatePropagation();
             return false;
           }
         }, true);
         
+        // Promise rejection 처리
         window.addEventListener('unhandledrejection', function(event) {
-          if (event.reason && (
-            (event.reason.message && (
-              event.reason.message.includes('storage is not allowed') ||
-              event.reason.message.includes('Access to storage') ||
-              event.reason.message.includes('localStorage')
-            )) ||
-            (typeof event.reason === 'string' && (
-              event.reason.includes('storage is not allowed') ||
-              event.reason.includes('Access to storage')
-            ))
-          )) {
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
+          const reason = event.reason;
+          if (reason) {
+            const errorMessage = reason.message || reason.toString() || '';
+            if (
+              errorMessage.includes('storage is not allowed') ||
+              errorMessage.includes('Access to storage') ||
+              errorMessage.includes('localStorage') ||
+              errorMessage.includes('Storage') ||
+              errorMessage.toLowerCase().includes('storage')
+            ) {
+              event.preventDefault();
+              event.stopPropagation();
+              event.stopImmediatePropagation();
+              return false;
+            }
           }
         }, true);
       })();

@@ -5,14 +5,18 @@
   // 동기 에러 처리
   const originalError = window.onerror
   window.onerror = function(message, source, lineno, colno, error) {
-    if (message && typeof message === 'string' && (
-      message.includes('storage is not allowed') ||
-      message.includes('Access to storage') ||
-      message.includes('localStorage') ||
-      message.includes('Storage')
-    )) {
-      // 에러를 완전히 무시하고 콘솔에도 표시 안 함
-      return true
+    if (message && typeof message === 'string') {
+      const msg = message.toLowerCase()
+      if (
+        msg.includes('storage is not allowed') ||
+        msg.includes('access to storage') ||
+        msg.includes('localstorage') ||
+        msg.includes('storage') ||
+        msg.includes('from this context')
+      ) {
+        // 에러를 완전히 무시하고 콘솔에도 표시 안 함
+        return true
+      }
     }
     // 다른 에러는 원래 핸들러로 전달
     if (originalError) {
@@ -24,23 +28,21 @@
   // 비동기 에러 처리 (Promise rejection) - capture phase에서 처리
   window.addEventListener('unhandledrejection', function(event) {
     const reason = event.reason
-    if (reason && (
-      (reason.message && (
-        reason.message.includes('storage is not allowed') ||
-        reason.message.includes('Access to storage') ||
-        reason.message.includes('localStorage') ||
-        reason.message.includes('Storage')
-      )) ||
-      (typeof reason === 'string' && (
-        reason.includes('storage is not allowed') ||
-        reason.includes('Access to storage')
-      ))
-    )) {
-      event.preventDefault()
-      event.stopPropagation()
-      event.stopImmediatePropagation()
-      // 에러를 완전히 무시
-      return false
+    if (reason) {
+      const errorMessage = (reason.message || reason.toString() || '').toLowerCase()
+      if (
+        errorMessage.includes('storage is not allowed') ||
+        errorMessage.includes('access to storage') ||
+        errorMessage.includes('localstorage') ||
+        errorMessage.includes('storage') ||
+        errorMessage.includes('from this context')
+      ) {
+        event.preventDefault()
+        event.stopPropagation()
+        event.stopImmediatePropagation()
+        // 에러를 완전히 무시
+        return false
+      }
     }
   }, true)
 })()
