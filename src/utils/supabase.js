@@ -62,10 +62,14 @@ const initializeSupabase = () => {
   if (supabaseInitialized) return
   supabaseInitialized = true
   
+  console.log('🔍 Supabase 초기화 시작...')
+  console.log('📍 URL:', supabaseUrl || '(없음)')
+  console.log('📍 Key:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : '(없음)')
+  
   if (!isSupabaseConfigured()) {
-    console.warn('⚠️ Supabase가 설정되지 않았습니다.')
-    console.log('📍 URL:', supabaseUrl || '(없음)')
-    console.log('📍 Key:', supabaseAnonKey ? `${supabaseAnonKey.substring(0, 20)}...` : '(없음)')
+    console.error('❌ Supabase가 설정되지 않았습니다. 환경 변수를 확인하세요.')
+    console.error('VITE_SUPABASE_URL:', import.meta.env.VITE_SUPABASE_URL ? '설정됨' : '없음')
+    console.error('VITE_SUPABASE_ANON_KEY:', import.meta.env.VITE_SUPABASE_ANON_KEY ? '설정됨' : '없음')
     return
   }
   
@@ -127,10 +131,8 @@ const initializeSupabase = () => {
   }
 }
 
-// 앱 시작 시 초기화 (약간의 지연을 두고)
-setTimeout(() => {
-  initializeSupabase()
-}, 100)
+// 앱 시작 시 즉시 초기화
+initializeSupabase()
 
 // supabase 접근 시 자동 초기화
 const getSupabase = () => {
