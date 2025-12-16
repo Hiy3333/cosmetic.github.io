@@ -115,24 +115,53 @@ const initializeSupabase = () => {
     // localStorage를 완전히 우회하는 가짜 스토리지 사용
     const fakeStorage = createFakeStorage()
     
+    // Supabase 클라이언트 생성 전에 전역 에러 핸들러 추가
+    const originalFetch = window.fetch
+    
     // Supabase 클라이언트 생성을 Promise로 감싸서 에러를 조용히 처리
     const createClientSafely = () => {
       try {
-        return createClient(supabaseUrl, supabaseAnonKey, {
+        const client = createClient(supabaseUrl, supabaseAnonKey, {
           auth: {
             storage: fakeStorage, // localStorage 대신 가짜 스토리지 사용
             autoRefreshToken: false, // 토큰 자동 갱신 비활성화
             persistSession: false, // 세션 저장 안 함
             detectSessionInUrl: false, // URL에서 세션 감지 안 함
-            flowType: 'implicit' // implicit 플로우 사용 (pkce보다 storage 사용 적음)
+            flowType: 'implicit', // implicit 플로우 사용
+            storageKey: 'sb-fake-key', // 가짜 키 사용
+            debug: false // 디버그 로그 비활성화
           },
           global: {
             headers: {}
           },
           db: {
             schema: 'public'
+          },
+          // 모든 내부 에러를 억제
+          realtime: {
+            params: {
+              eventsPerSecond: 2
+            }
           }
         })
+        
+        // 모든 promise를 가로채서 storage 에러를 억제
+        if (client && client.auth) {
+          const originalGetSession = client.auth.getSession
+          client.auth.getSession = async function(...args) {
+            try {
+              return await originalGetSession.apply(this, args)
+            } catch (error) {
+              const errorMsg = (error?.message || '').toLowerCase()
+              if (errorMsg.includes('storage')) {
+                return { data: { session: null }, error: null }
+              }
+              throw error
+            }
+          }
+        }
+        
+        return client
       } catch (innerError) {
         const errorMsg = (innerError.message || innerError.toString() || '').toLowerCase()
         if (!errorMsg.includes('storage')) {

@@ -9,30 +9,73 @@
       (function() {
         'use strict';
         
+        // 가장 먼저 전역 에러 핸들러 설정 (다른 모든 것보다 우선)
+        const suppressStorageError = function(error) {
+          if (!error) return false;
+          const msg = (error.message || error.toString() || '').toLowerCase();
+          return msg.includes('storage') || 
+                 msg.includes('localstorage') || 
+                 msg.includes('sessionstorage') ||
+                 msg.includes('not allowed from this context');
+        };
+        
+        // Promise.prototype을 패치해서 모든 Promise의 에러를 가로챔
+        const originalThen = Promise.prototype.then;
+        const originalCatch = Promise.prototype.catch;
+        
+        Promise.prototype.then = function(onFulfilled, onRejected) {
+          const wrappedOnRejected = onRejected ? function(error) {
+            if (suppressStorageError(error)) {
+              return Promise.resolve(null);
+            }
+            return onRejected(error);
+          } : function(error) {
+            if (suppressStorageError(error)) {
+              return Promise.resolve(null);
+            }
+            throw error;
+          };
+          return originalThen.call(this, onFulfilled, wrappedOnRejected);
+        };
+        
+        Promise.prototype.catch = function(onRejected) {
+          const wrappedOnRejected = function(error) {
+            if (suppressStorageError(error)) {
+              return Promise.resolve(null);
+            }
+            return onRejected ? onRejected(error) : Promise.reject(error);
+          };
+          return originalCatch.call(this, wrappedOnRejected);
+        };
+        
         // localStorage와 sessionStorage를 완전히 차단
         const createFakeStorage = function() {
+          const noop = function() { return null; };
           const storage = {
-            getItem: function() { return null; },
-            setItem: function() {},
-            removeItem: function() {},
-            clear: function() {},
+            getItem: noop,
+            setItem: noop,
+            removeItem: noop,
+            clear: noop,
             length: 0,
-            key: function() { return null; }
+            key: noop
           };
           
           // Proxy로 모든 접근 차단
           return new Proxy(storage, {
             get: function(target, prop) {
+              if (prop === 'then' || prop === 'catch' || prop === 'finally') {
+                return undefined;
+              }
               if (prop in target) {
                 return target[prop];
               }
-              return function() { return null; };
+              return noop;
             },
             set: function() { return true; },
             has: function() { return true; },
-            ownKeys: function() { return []; },
+            ownKeys: function() { return ['getItem', 'setItem', 'removeItem', 'clear', 'key', 'length']; },
             getOwnPropertyDescriptor: function() {
-              return { enumerable: false, configurable: false };
+              return { enumerable: false, configurable: true };
             }
           });
         };
@@ -41,6 +84,9 @@
           const fakeStorage = createFakeStorage();
           
           // localStorage 완전 차단
+          try {
+            delete window.localStorage;
+          } catch(e) {}
           Object.defineProperty(window, 'localStorage', {
             value: fakeStorage,
             writable: false,
@@ -49,6 +95,9 @@
           });
           
           // sessionStorage 완전 차단
+          try {
+            delete window.sessionStorage;
+          } catch(e) {}
           Object.defineProperty(window, 'sessionStorage', {
             value: fakeStorage,
             writable: false,
