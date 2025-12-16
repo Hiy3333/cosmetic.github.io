@@ -83,16 +83,25 @@
   background: #ffffff;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  position: relative;
+  z-index: 1;
 }
 
 .dropdown-text {
   flex: 1;
+  pointer-events: none; /* 텍스트는 클릭 이벤트를 부모로 전달 */
 }
 
 .dropdown-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+  pointer-events: auto; /* 액션 버튼은 독립적으로 클릭 가능 */
 }
 
 .clear-btn {
@@ -103,6 +112,9 @@
   border-radius: 4px;
   transition: all 0.2s;
   line-height: 1;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .clear-btn:hover {
@@ -120,6 +132,7 @@
   color: #999;
   font-size: 0.8rem;
   transition: transform 0.3s;
+  pointer-events: none; /* 화살표는 클릭 이벤트를 부모로 전달 */
 }
 
 .dropdown-list {
@@ -132,10 +145,11 @@
   border-radius: 12px;
   margin-top: 8px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
-  z-index: 100;
+  z-index: 1000; /* z-index 증가 */
   max-height: 200px;
   overflow-y: auto;
   animation: slideDown 0.2s ease-out;
+  pointer-events: auto;
 }
 
 @keyframes slideDown {
@@ -166,6 +180,9 @@
   padding: 8px 0; /* 클릭 영역 확대 */
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .delete-btn {
@@ -182,6 +199,11 @@
   justify-content: center;
   width: 24px;
   height: 24px;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .delete-btn:hover {
