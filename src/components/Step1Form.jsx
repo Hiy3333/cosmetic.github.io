@@ -27,7 +27,7 @@ function Step1Form({ formData, onNext }) {
   const [showAddAuthor, setShowAddAuthor] = useState(false)
   
   // 피부타입 옵션
-  const skinTypes = ['건성', '지성', '복합성']
+  const skinTypes = ['건성', '지성', '복합성', '일반성', '민감성']
   const [showSkinTypeList, setShowSkinTypeList] = useState(false)
 
   // 컴포넌트 마운트 시 저장된 목록 불러오기
