@@ -5,21 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>샘플 테스트</title>
     <script>
-      // localStorage 접근 에러를 완전히 억제 (스크립트 로드 전에 실행)
+      // localStorage 접근을 완전히 차단하고 에러 억제
       (function() {
         'use strict';
+        
+        // localStorage와 sessionStorage를 가짜 객체로 교체
+        try {
+          const fakeStorage = {
+            getItem: function() { return null; },
+            setItem: function() {},
+            removeItem: function() {},
+            clear: function() {},
+            length: 0,
+            key: function() { return null; }
+          };
+          
+          Object.defineProperty(window, 'localStorage', {
+            value: fakeStorage,
+            writable: false,
+            configurable: false
+          });
+          
+          Object.defineProperty(window, 'sessionStorage', {
+            value: fakeStorage,
+            writable: false,
+            configurable: false
+          });
+        } catch (e) {
+          // 이미 정의되어 있으면 무시
+        }
         
         // window.onerror로 동기 에러 처리
         const originalOnError = window.onerror;
         window.onerror = function(message, source, lineno, colno, error) {
-          if (message && typeof message === 'string' && (
-            message.includes('storage is not allowed') ||
-            message.includes('Access to storage') ||
-            message.includes('localStorage') ||
-            message.includes('Storage') ||
-            message.toLowerCase().includes('storage')
-          )) {
-            return true; // 에러 무시
+          if (message && typeof message === 'string') {
+            const msg = message.toLowerCase();
+            if (
+              msg.includes('storage') ||
+              msg.includes('localstorage') ||
+              msg.includes('sessionstorage') ||
+              msg.includes('access to storage') ||
+              msg.includes('from this context')
+            ) {
+              return true; // 에러 무시
+            }
           }
           if (originalOnError) {
             return originalOnError.call(this, message, source, lineno, colno, error);
@@ -29,17 +58,20 @@
         
         // error 이벤트 리스너로 에러 처리
         window.addEventListener('error', function(event) {
-          if (event.message && (
-            event.message.includes('storage is not allowed') ||
-            event.message.includes('Access to storage') ||
-            event.message.includes('localStorage') ||
-            event.message.includes('Storage') ||
-            event.message.toLowerCase().includes('storage')
-          )) {
-            event.preventDefault();
-            event.stopPropagation();
-            event.stopImmediatePropagation();
-            return false;
+          if (event.message) {
+            const msg = event.message.toLowerCase();
+            if (
+              msg.includes('storage') ||
+              msg.includes('localstorage') ||
+              msg.includes('sessionstorage') ||
+              msg.includes('access to storage') ||
+              msg.includes('from this context')
+            ) {
+              event.preventDefault();
+              event.stopPropagation();
+              event.stopImmediatePropagation();
+              return false;
+            }
           }
         }, true);
         
@@ -47,13 +79,13 @@
         window.addEventListener('unhandledrejection', function(event) {
           const reason = event.reason;
           if (reason) {
-            const errorMessage = reason.message || reason.toString() || '';
+            const errorMessage = (reason.message || reason.toString() || '').toLowerCase();
             if (
-              errorMessage.includes('storage is not allowed') ||
-              errorMessage.includes('Access to storage') ||
-              errorMessage.includes('localStorage') ||
-              errorMessage.includes('Storage') ||
-              errorMessage.toLowerCase().includes('storage')
+              errorMessage.includes('storage') ||
+              errorMessage.includes('localstorage') ||
+              errorMessage.includes('sessionstorage') ||
+              errorMessage.includes('access to storage') ||
+              errorMessage.includes('from this context')
             ) {
               event.preventDefault();
               event.stopPropagation();

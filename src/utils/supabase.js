@@ -34,28 +34,35 @@ if (isSupabaseConfigured()) {
     const fakeStorage = createFakeStorage()
     
     // localStorage를 완전히 우회하는 가짜 스토리지 사용
+    // flowType을 'pkce'로 설정하여 더 안전한 인증 방식 사용
     supabase = createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         storage: fakeStorage, // localStorage 대신 가짜 스토리지 사용
         autoRefreshToken: false, // 토큰 자동 갱신 비활성화 (인증 사용 안 함)
         persistSession: false, // 세션 저장 안 함
-        detectSessionInUrl: false
+        detectSessionInUrl: false,
+        flowType: 'pkce' // PKCE 플로우 사용 (더 안전)
       },
       global: {
         headers: {}
+      },
+      db: {
+        schema: 'public'
+      },
+      realtime: {
+        params: {
+          eventsPerSecond: 10
+        }
       }
     })
     
     console.log('✅ Supabase 클라이언트가 생성되었습니다.')
     console.log('📍 URL:', supabaseUrl)
   } catch (error) {
-    // localStorage 관련 에러는 무시
-    if (error.message && error.message.includes('storage')) {
-      console.warn('⚠️ localStorage 접근 에러가 발생했지만 Supabase 클라이언트는 생성되었습니다.')
-    } else {
-      console.error('❌ Supabase 클라이언트 생성 실패:', error)
-      supabase = null
-    }
+    // 모든 에러를 무시하고 계속 진행 (앱이 작동해야 함)
+    console.warn('⚠️ Supabase 클라이언트 생성 중 경고:', error.message || error)
+    // 에러가 발생해도 null로 설정하여 앱이 계속 작동하도록 함
+    supabase = null
   }
 } else {
   console.warn('⚠️ Supabase가 설정되지 않았습니다.')
