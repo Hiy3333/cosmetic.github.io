@@ -86,6 +86,8 @@ const initializeSupabase = () => {
     return
   }
   
+  console.log('⚙️ Auth를 완전히 비활성화하여 초기화합니다...')
+  
   // Promise 에러를 완전히 차단하는 래퍼
   const suppressedPromise = (promiseFactory) => {
     try {
@@ -118,49 +120,45 @@ const initializeSupabase = () => {
     // Supabase 클라이언트 생성 전에 전역 에러 핸들러 추가
     const originalFetch = window.fetch
     
-    // Supabase 클라이언트 생성을 Promise로 감싸서 에러를 조용히 처리
+    // Supabase 클라이언트 생성 - Auth 완전 비활성화
     const createClientSafely = () => {
       try {
+        // 최소한의 설정으로 클라이언트 생성 (auth 기능 완전 비활성화)
         const client = createClient(supabaseUrl, supabaseAnonKey, {
           auth: {
-            storage: fakeStorage, // localStorage 대신 가짜 스토리지 사용
-            autoRefreshToken: false, // 토큰 자동 갱신 비활성화
-            persistSession: false, // 세션 저장 안 함
-            detectSessionInUrl: false, // URL에서 세션 감지 안 함
-            flowType: 'implicit', // implicit 플로우 사용
-            storageKey: 'sb-fake-key', // 가짜 키 사용
-            debug: false // 디버그 로그 비활성화
-          },
-          global: {
-            headers: {}
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false,
+            storage: fakeStorage,
+            storageKey: 'supabase-auth-token-disabled',
+            flowType: 'implicit'
           },
           db: {
             schema: 'public'
           },
-          // 모든 내부 에러를 억제
-          realtime: {
-            params: {
-              eventsPerSecond: 2
+          global: {
+            headers: {
+              'X-Client-Info': 'supabase-js-web'
             }
           }
         })
         
-        // 모든 promise를 가로채서 storage 에러를 억제
+        // auth 모듈을 완전히 무력화
         if (client && client.auth) {
-          const originalGetSession = client.auth.getSession
-          client.auth.getSession = async function(...args) {
-            try {
-              return await originalGetSession.apply(this, args)
-            } catch (error) {
-              const errorMsg = (error?.message || '').toLowerCase()
-              if (errorMsg.includes('storage')) {
-                return { data: { session: null }, error: null }
-              }
-              throw error
-            }
+          // getSession을 항상 null 세션을 반환하도록 오버라이드
+          client.auth.getSession = async () => {
+            return { data: { session: null }, error: null }
+          }
+          // 다른 auth 메서드들도 무력화
+          client.auth.getUser = async () => {
+            return { data: { user: null }, error: null }
+          }
+          client.auth.onAuthStateChange = () => {
+            return { data: { subscription: { unsubscribe: () => {} } } }
           }
         }
         
+        console.log('✅ Auth 비활성화 완료 - 데이터 전용 클라이언트 생성 성공')
         return client
       } catch (innerError) {
         const errorMsg = (innerError.message || innerError.toString() || '').toLowerCase()
