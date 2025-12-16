@@ -2,6 +2,8 @@
   background: white;
   border-radius: 10px;
   padding: 20px;
+  margin: 0 auto; /* 중앙 정렬 */
+  max-width: 100%; /* 최대 너비 제한 */
 }
 
 .calendar-header {
@@ -194,22 +196,26 @@
 /* 모바일 반응형 스타일 */
 @media (max-width: 768px) {
   .calendar {
-    padding: 10px;
+    padding: 8px;
     overflow-x: hidden; /* 좌우 스크롤 제거 */
     width: 100%;
     max-width: 100%;
+    margin: 0 auto; /* 중앙 정렬 */
+    box-sizing: border-box;
   }
 
   .calendar-header {
     flex-wrap: nowrap; /* 한 줄로 유지 */
-    gap: 6px;
-    margin-bottom: 12px;
+    gap: 4px;
+    margin-bottom: 10px;
+    justify-content: center; /* 중앙 정렬 */
+    padding: 0 5px;
   }
 
   .calendar-nav-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
     flex-shrink: 0;
   }
 
@@ -217,46 +223,49 @@
     flex-direction: column;
     gap: 2px;
     min-width: 0; /* flexbox 축소 허용 */
+    text-align: center;
   }
 
   .calendar-month {
-    font-size: 1rem;
+    font-size: 0.95rem;
     line-height: 1.2;
   }
 
   .calendar-year {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     line-height: 1.2;
   }
 
   .calendar-today-btn {
-    padding: 5px 10px;
-    font-size: 0.75rem;
+    padding: 4px 8px;
+    font-size: 0.7rem;
     flex-shrink: 0;
     white-space: nowrap;
   }
 
   .calendar-weekdays {
-    gap: 2px;
-    margin-bottom: 6px;
+    gap: 1px;
+    margin-bottom: 5px;
+    padding: 0 2px; /* 좌우 여백 균등 */
   }
 
   .calendar-weekday {
-    padding: 6px 2px;
-    font-size: 0.7rem;
+    padding: 5px 1px;
+    font-size: 0.65rem;
   }
 
   .calendar-days {
-    gap: 2px;
+    gap: 1px;
+    padding: 0 2px; /* 좌우 여백 균등 */
   }
 
   .calendar-day {
-    min-height: 45px;
-    padding: 3px 2px;
+    min-height: 40px;
+    padding: 2px 1px;
   }
 
   .calendar-day-number {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     margin-bottom: 1px;
   }
 
@@ -266,27 +275,28 @@
   }
 
   .calendar-day-score-item {
-    font-size: 0.5rem;
+    font-size: 0.45rem;
     line-height: 1;
     word-break: break-word;
     max-width: 100%;
   }
 
   .calendar-test-indicator {
-    width: 5px;
-    height: 5px;
-    bottom: 3px;
+    width: 4px;
+    height: 4px;
+    bottom: 2px;
   }
 
   .calendar-legend {
     flex-direction: column;
-    gap: 8px;
-    margin-top: 12px;
-    padding-top: 12px;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 10px;
   }
 
   .legend-item {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
+    justify-content: center; /* 중앙 정렬 */
   }
 }
 

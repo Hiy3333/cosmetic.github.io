@@ -157,10 +157,15 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  -webkit-tap-highlight-color: transparent; /* 모바일 탭 하이라이트 제거 */
+  touch-action: manipulation; /* 터치 반응 개선 */
 }
 
 .dropdown-item-text {
   flex: 1;
+  padding: 8px 0; /* 클릭 영역 확대 */
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .delete-btn {
@@ -324,12 +329,39 @@
   }
 
   .dropdown-input {
-    padding: 12px 15px;
+    padding: 14px 15px; /* 패딩 증가로 클릭 영역 확대 */
     font-size: 0.95rem;
+    min-height: 50px; /* 최소 높이 지정 */
   }
 
   .dropdown-list {
     max-width: 100%;
+  }
+
+  .dropdown-item {
+    padding: 15px 16px; /* 모바일에서 클릭 영역 확대 */
+    min-height: 50px; /* 최소 높이 지정 */
+  }
+
+  .dropdown-item-text {
+    padding: 10px 0; /* 모바일에서 클릭 영역 더 확대 */
+    font-size: 0.95rem;
+  }
+
+  .delete-btn {
+    min-width: 40px; /* 삭제 버튼 클릭 영역 확대 */
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .clear-btn {
+    min-width: 36px; /* 클리어 버튼 클릭 영역 확대 */
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .input-wrapper {
