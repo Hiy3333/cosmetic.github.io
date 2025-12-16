@@ -9,9 +9,9 @@
       (function() {
         'use strict';
         
-        // localStorage와 sessionStorage를 가짜 객체로 교체
-        try {
-          const fakeStorage = {
+        // localStorage와 sessionStorage를 완전히 차단
+        const createFakeStorage = function() {
+          const storage = {
             getItem: function() { return null; },
             setItem: function() {},
             removeItem: function() {},
@@ -20,17 +20,50 @@
             key: function() { return null; }
           };
           
+          // Proxy로 모든 접근 차단
+          return new Proxy(storage, {
+            get: function(target, prop) {
+              if (prop in target) {
+                return target[prop];
+              }
+              return function() { return null; };
+            },
+            set: function() { return true; },
+            has: function() { return true; },
+            ownKeys: function() { return []; },
+            getOwnPropertyDescriptor: function() {
+              return { enumerable: false, configurable: false };
+            }
+          });
+        };
+        
+        try {
+          const fakeStorage = createFakeStorage();
+          
+          // localStorage 완전 차단
           Object.defineProperty(window, 'localStorage', {
             value: fakeStorage,
             writable: false,
-            configurable: false
+            configurable: false,
+            enumerable: false
           });
           
+          // sessionStorage 완전 차단
           Object.defineProperty(window, 'sessionStorage', {
             value: fakeStorage,
             writable: false,
-            configurable: false
+            configurable: false,
+            enumerable: false
           });
+          
+          // Storage 생성자도 차단
+          if (window.Storage) {
+            Object.defineProperty(window, 'Storage', {
+              value: function() { return fakeStorage; },
+              writable: false,
+              configurable: false
+            });
+          }
         } catch (e) {
           // 이미 정의되어 있으면 무시
         }
