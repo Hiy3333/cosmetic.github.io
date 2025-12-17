@@ -3,6 +3,11 @@ import { getManufacturers, saveManufacturers, getAuthors, saveAuthors, getPrevio
 import './Step1Form.css'
 
 function Step1Form({ formData, onNext }) {
+  // 날짜와 시간 상태 추가
+  const [testDate, setTestDate] = useState(formData.testDate || new Date().toISOString().split('T')[0])
+  const [timeHour, setTimeHour] = useState(formData.timeSlot ? formData.timeSlot.split(':')[0] : '')
+  const [timeMinute, setTimeMinute] = useState(formData.timeSlot ? formData.timeSlot.split(':')[1] : '')
+  
   const [manufacturer, setManufacturer] = useState(formData.manufacturer || '')
   const [sampleNumber, setSampleNumber] = useState(formData.sampleNumber || '')
   const [author, setAuthor] = useState(formData.author || '')
@@ -210,6 +215,21 @@ function Step1Form({ formData, onNext }) {
     e.preventDefault()
     
     // 모든 필드 검증
+    if (!testDate) {
+      alert('테스트 날짜를 선택해주세요.')
+      return
+    }
+    if (!timeHour || !timeMinute) {
+      alert('시간을 입력해주세요.')
+      return
+    }
+    // 시간 유효성 검증
+    const hour = parseInt(timeHour)
+    const minute = parseInt(timeMinute)
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+      alert('올바른 시간을 입력해주세요. (시: 0-23, 분: 0-59)')
+      return
+    }
     if (!manufacturer) {
       alert('제조사명을 선택해주세요.')
       return
@@ -231,9 +251,14 @@ function Step1Form({ formData, onNext }) {
       return
     }
 
+    // 시간 포맷 (HH:MM)
+    const timeSlot = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+
     // 하루에 여러 번 테스트 가능하도록 변경 (제한 제거)
 
     onNext({
+      testDate,
+      timeSlot,
       manufacturer,
       sampleNumber,
       author,
@@ -244,6 +269,46 @@ function Step1Form({ formData, onNext }) {
 
   return (
     <form className="step1-form" onSubmit={handleSubmit}>
+      {/* 테스트 날짜 선택 */}
+      <div className="form-group">
+        <label>테스트 날짜 *</label>
+        <input
+          type="date"
+          value={testDate}
+          onChange={(e) => setTestDate(e.target.value)}
+          className="form-input"
+          required
+        />
+      </div>
+
+      {/* 시간 입력 */}
+      <div className="form-group">
+        <label>시간 *</label>
+        <div className="time-input-wrapper">
+          <input
+            type="number"
+            value={timeHour}
+            onChange={(e) => setTimeHour(e.target.value)}
+            placeholder="시"
+            className="form-input time-input"
+            min="0"
+            max="23"
+            required
+          />
+          <span className="time-separator">:</span>
+          <input
+            type="number"
+            value={timeMinute}
+            onChange={(e) => setTimeMinute(e.target.value)}
+            placeholder="분"
+            className="form-input time-input"
+            min="0"
+            max="59"
+            required
+          />
+        </div>
+      </div>
+
       {/* 제조사명 선택 */}
       <div className="form-group">
         <label>OEM 제조사명 *</label>

@@ -351,7 +351,23 @@
   transform: translateY(-1px);
 }
 
-/* 시간대 입력 스타일은 form-input과 동일하게 사용 */
+/* 시간 입력 스타일 */
+.time-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.time-input {
+  flex: 1;
+  text-align: center;
+}
+
+.time-separator {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d3748;
+}
 
 /* 모바일 반응형 스타일 */
 @media (max-width: 768px) {
@@ -464,6 +480,18 @@
   .btn-cancel {
     width: 100%;
     padding: 10px;
+  }
+
+  .time-input-wrapper {
+    gap: 8px;
+  }
+
+  .time-input {
+    font-size: 16px; /* iOS 줌 방지 */
+  }
+
+  .time-separator {
+    font-size: 1.3rem;
   }
 }
 

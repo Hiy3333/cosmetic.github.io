@@ -6,13 +6,14 @@ import { supabase } from './supabase'
 // 테스트 데이터 저장
 export const saveTestData = async (formData) => {
   try {
-    const today = new Date().toISOString().split('T')[0]
+    // 선택된 날짜 사용 (없으면 오늘 날짜)
+    const testDate = formData.testDate || new Date().toISOString().split('T')[0]
     
     // 중복 체크: 같은 날짜, 작성자, 제조사, 샘플 넘버, 회차의 테스트가 이미 있는지 확인
     const { data: existingTests, error: checkError } = await supabase
       .from('tests')
       .select('*')
-      .eq('date', today)
+      .eq('date', testDate)
       .eq('author', formData.author)
       .eq('manufacturer', formData.manufacturer)
       .eq('sample_number', formData.sampleNumber)
@@ -37,23 +38,29 @@ export const saveTestData = async (formData) => {
       ? (totalScore / scoreValues.length).toFixed(2) 
       : 0
     
+    // Supabase에 저장할 데이터 준비
+    const dataToInsert = {
+      date: testDate,
+      manufacturer: formData.manufacturer,
+      sample_number: formData.sampleNumber,
+      author: formData.author,
+      usage_count: formData.usageCount,
+      skin_type: formData.skinType,
+      scores: scores,
+      improvement: formData.improvement || '',
+      total_score: totalScore,
+      average_score: parseFloat(averageScore)
+    }
+    
+    // 시간 정보가 있으면 추가
+    if (formData.timeSlot) {
+      dataToInsert.time_slot = formData.timeSlot
+    }
+    
     // Supabase에 저장
     const { data, error } = await supabase
       .from('tests')
-      .insert([
-        {
-          date: today,
-          manufacturer: formData.manufacturer,
-          sample_number: formData.sampleNumber,
-          author: formData.author,
-          usage_count: formData.usageCount,
-          skin_type: formData.skinType,
-          scores: scores,
-          improvement: formData.improvement || '',
-          total_score: totalScore,
-          average_score: parseFloat(averageScore)
-        }
-      ])
+      .insert([dataToInsert])
       .select()
       .single()
     

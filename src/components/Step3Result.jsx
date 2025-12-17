@@ -55,6 +55,14 @@ function Step3Result({ formData, onReset }) {
         <h3 className="section-title">기본 정보</h3>
         <div className="info-grid">
           <div className="info-item">
+            <span className="info-label">테스트 날짜:</span>
+            <span className="info-value">{formData.testDate}</span>
+          </div>
+          <div className="info-item">
+            <span className="info-label">시간:</span>
+            <span className="info-value">{formData.timeSlot}</span>
+          </div>
+          <div className="info-item">
             <span className="info-label">제조사명:</span>
             <span className="info-value">{formData.manufacturer}</span>
           </div>
