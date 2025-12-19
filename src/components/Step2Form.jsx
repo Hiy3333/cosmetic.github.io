@@ -28,7 +28,7 @@ const testItems = [
 function Step2Form({ onNext, onBack }) {
   const [scores, setScores] = useState({})
   const [improvement, setImprovement] = useState('')
-  const [negativeFeedback, setNegativeFeedback] = useState({}) // 피막감, 유분감의 부정적 피드백
+  const [negativeFeedback, setNegativeFeedback] = useState({}) // 피막감, 끈적임의 부정적 피드백
   const [confirmedItems, setConfirmedItems] = useState({}) // 확인 버튼을 누른 항목들
   const itemRefs = useRef({})
 
