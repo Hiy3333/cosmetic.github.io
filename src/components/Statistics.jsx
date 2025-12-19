@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { getTestData, getAllManufacturers, getManufacturers, getAllAuthors, getAuthors, getTestDataByDateAndManufacturer, getTestDataByAuthorAndManufacturer, subscribeToTests, subscribeToManufacturers, subscribeToAuthors } from '../utils/storage'
+import { migrateOilnessToStickiness } from '../utils/migrateData'
 import Calendar from './Calendar'
 import ScoreChart from './ScoreChart'
 import TestDetailModal from './TestDetailModal'
@@ -44,7 +45,22 @@ function Statistics() {
 
   // 컴포넌트 마운트 시 및 페이지 포커스 시 데이터 로드
   useEffect(() => {
-    loadData(false) // 초기 로드 시에는 선택 유지 안 함
+    // 마이그레이션 실행 (한 번만 실행되도록 localStorage 체크)
+    const migrationKey = 'data_migration_oilness_to_stickiness_done'
+    const isMigrationDone = localStorage.getItem(migrationKey)
+    
+    if (!isMigrationDone) {
+      migrateOilnessToStickiness().then((success) => {
+        if (success) {
+          localStorage.setItem(migrationKey, 'true')
+          console.log('데이터 마이그레이션 완료')
+          // 마이그레이션 후 데이터 새로고침
+          loadData(false)
+        }
+      })
+    } else {
+      loadData(false) // 초기 로드 시에는 선택 유지 안 함
+    }
     
     // 페이지가 포커스를 받을 때 데이터 새로고침 (선택 유지)
     const handleFocus = () => {
