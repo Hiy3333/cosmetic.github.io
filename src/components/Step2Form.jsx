@@ -21,7 +21,7 @@ const testItems = [
   '열감',
   '트러블',
   '피막감',
-  '유분감',
+  '끈적임',
   '타깃 제품과 제형 유사성'
 ]
 
@@ -39,8 +39,8 @@ function Step2Form({ onNext, onBack }) {
       [item]: score
     }))
     
-    // 피막감, 유분감, 제형 안정성에서 매우 별로다(1점) 또는 별로다(2점)를 선택하지 않으면 확인 상태 초기화
-    if ((item === '피막감' || item === '유분감' || item === '제형 안정성') && score !== 1 && score !== 2) {
+    // 피막감, 끈적임, 제형 안정성에서 매우 별로다(1점) 또는 별로다(2점)를 선택하지 않으면 확인 상태 초기화
+    if ((item === '피막감' || item === '끈적임' || item === '제형 안정성') && score !== 1 && score !== 2) {
       setConfirmedItems(prev => {
         const newState = { ...prev }
         delete newState[item]
@@ -68,10 +68,10 @@ function Step2Form({ onNext, onBack }) {
     }
     
     // 텍스트창이 필요한 항목들은 자동 스크롤하지 않음
-    const itemsNeedingFeedback = ['피막감', '유분감', '제형 안정성', '후속화장품 흡수', '점도(육안)']
+    const itemsNeedingFeedback = ['피막감', '끈적임', '제형 안정성', '후속화장품 흡수', '점도(육안)']
     const needsFeedback = itemsNeedingFeedback.includes(item) && (
-      // 피막감, 유분감, 제형 안정성: 1점 또는 2점 선택 시
-      ((item === '피막감' || item === '유분감' || item === '제형 안정성') && (score === 1 || score === 2)) ||
+      // 피막감, 끈적임, 제형 안정성: 1점 또는 2점 선택 시
+      ((item === '피막감' || item === '끈적임' || item === '제형 안정성') && (score === 1 || score === 2)) ||
       // 후속화장품 흡수, 점도(육안): 어떤 점수든 선택 시
       (item === '후속화장품 흡수' || item === '점도(육안)')
     )
@@ -123,8 +123,8 @@ function Step2Form({ onNext, onBack }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     
-    // 피막감, 유분감, 제형 안정성에서 매우 별로다(1점) 또는 별로다(2점)를 선택했는데 확인을 안한 경우 체크
-    const itemsNeedingConfirmation = ['피막감', '유분감', '제형 안정성']
+    // 피막감, 끈적임, 제형 안정성에서 매우 별로다(1점) 또는 별로다(2점)를 선택했는데 확인을 안한 경우 체크
+    const itemsNeedingConfirmation = ['피막감', '끈적임', '제형 안정성']
     const unconfirmedItems = itemsNeedingConfirmation.filter(item => {
       const score = scores[item]
       return (score === 1 || score === 2) && !confirmedItems[item]
@@ -164,7 +164,7 @@ function Step2Form({ onNext, onBack }) {
       <div className="test-items-container">
         {testItems.map((item, index) => {
           // 텍스트창이 필요한 항목들
-          const itemsNeedingFeedback = ['피막감', '유분감', '제형 안정성', '후속화장품 흡수', '점도(육안)']
+          const itemsNeedingFeedback = ['피막감', '끈적임', '제형 안정성', '후속화장품 흡수', '점도(육안)']
           
           // 이전 항목 중 확인이 필요한 항목이 있는지 확인
           const hasUnconfirmedPreviousItem = testItems.slice(0, index).some(prevItem => {
@@ -175,7 +175,7 @@ function Step2Form({ onNext, onBack }) {
               // 후속화장품 흡수, 점도(육안)는 어떤 점수든 확인 필요
               return prevScore !== undefined && !confirmedItems[prevItem]
             } else {
-              // 피막감, 유분감, 제형 안정성은 1점 또는 2점일 때만 확인 필요
+              // 피막감, 끈적임, 제형 안정성은 1점 또는 2점일 때만 확인 필요
               return (prevScore === 1 || prevScore === 2) && !confirmedItems[prevItem]
             }
           })
@@ -233,8 +233,8 @@ function Step2Form({ onNext, onBack }) {
                     { label: '같다', score: 4 },
                     { label: '매우 같다', score: 5 }
                   ]
-                } else if (item === '피막감' || item === '유분감') {
-                  // 피막감, 유분감 선택지
+                } else if (item === '피막감' || item === '끈적임') {
+                  // 피막감, 끈적임 선택지
                   options = [
                     { label: '매우 별로다', score: 1 },
                     { label: '별로다', score: 2 },
@@ -298,8 +298,8 @@ function Step2Form({ onNext, onBack }) {
                 })
               })()}
             </div>
-            {/* 피막감, 유분감, 제형 안정성에서 매우 별로다(1점) 또는 별로다(2점)를 선택한 경우 텍스트 박스 표시 */}
-            {((item === '피막감' || item === '유분감' || item === '제형 안정성') && (scores[item] === 1 || scores[item] === 2) && !confirmedItems[item]) && (
+            {/* 피막감, 끈적임, 제형 안정성에서 매우 별로다(1점) 또는 별로다(2점)를 선택한 경우 텍스트 박스 표시 */}
+            {((item === '피막감' || item === '끈적임' || item === '제형 안정성') && (scores[item] === 1 || scores[item] === 2) && !confirmedItems[item]) && (
               <div className="negative-feedback-box">
                 <textarea
                   className="negative-feedback-input"
@@ -337,7 +337,7 @@ function Step2Form({ onNext, onBack }) {
               </div>
             )}
             {/* 확인 완료 표시 */}
-            {((item === '피막감' || item === '유분감' || item === '제형 안정성' || item === '후속화장품 흡수' || item === '점도(육안)') && confirmedItems[item]) && (
+            {((item === '피막감' || item === '끈적임' || item === '제형 안정성' || item === '후속화장품 흡수' || item === '점도(육안)') && confirmedItems[item]) && (
               <div className="feedback-confirmed">
                 ✓ 확인 완료
               </div>
