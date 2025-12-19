@@ -3,7 +3,7 @@ import './Step2Form.css'
 
 // 테스트 항목 목록
 const testItems = [
-  '점도',
+  '점도(육안)',
   '제형 안정성',
   '롤링감(뭉침)',
   '흡수 속도',
@@ -53,8 +53,8 @@ function Step2Form({ onNext, onBack }) {
       })
     }
     
-    // 후속화장품 흡수, 점도는 점수가 변경되면 확인 상태 초기화 (다시 입력하도록)
-    if ((item === '후속화장품 흡수' || item === '점도') && confirmedItems[item]) {
+    // 후속화장품 흡수, 점도(육안)는 점수가 변경되면 확인 상태 초기화 (다시 입력하도록)
+    if ((item === '후속화장품 흡수' || item === '점도(육안)') && confirmedItems[item]) {
       setConfirmedItems(prev => {
         const newState = { ...prev }
         delete newState[item]
@@ -68,12 +68,12 @@ function Step2Form({ onNext, onBack }) {
     }
     
     // 텍스트창이 필요한 항목들은 자동 스크롤하지 않음
-    const itemsNeedingFeedback = ['피막감', '유분감', '제형 안정성', '후속화장품 흡수', '점도']
+    const itemsNeedingFeedback = ['피막감', '유분감', '제형 안정성', '후속화장품 흡수', '점도(육안)']
     const needsFeedback = itemsNeedingFeedback.includes(item) && (
       // 피막감, 유분감, 제형 안정성: 1점 또는 2점 선택 시
       ((item === '피막감' || item === '유분감' || item === '제형 안정성') && (score === 1 || score === 2)) ||
-      // 후속화장품 흡수, 점도: 어떤 점수든 선택 시
-      (item === '후속화장품 흡수' || item === '점도')
+      // 후속화장품 흡수, 점도(육안): 어떤 점수든 선택 시
+      (item === '후속화장품 흡수' || item === '점도(육안)')
     )
     
     // 텍스트창이 필요하지 않은 경우에만 다음 항목으로 스크롤 이동
@@ -130,8 +130,8 @@ function Step2Form({ onNext, onBack }) {
       return (score === 1 || score === 2) && !confirmedItems[item]
     })
     
-    // 후속화장품 흡수, 점도는 어떤 선택지를 선택하든 확인을 해야 함
-    const itemsAlwaysNeedingConfirmation = ['후속화장품 흡수', '점도']
+    // 후속화장품 흡수, 점도(육안)는 어떤 선택지를 선택하든 확인을 해야 함
+    const itemsAlwaysNeedingConfirmation = ['후속화장품 흡수', '점도(육안)']
     const unconfirmedAlwaysItems = itemsAlwaysNeedingConfirmation.filter(item => {
       const score = scores[item]
       return score !== undefined && !confirmedItems[item]
@@ -164,15 +164,15 @@ function Step2Form({ onNext, onBack }) {
       <div className="test-items-container">
         {testItems.map((item, index) => {
           // 텍스트창이 필요한 항목들
-          const itemsNeedingFeedback = ['피막감', '유분감', '제형 안정성', '후속화장품 흡수', '점도']
+          const itemsNeedingFeedback = ['피막감', '유분감', '제형 안정성', '후속화장품 흡수', '점도(육안)']
           
           // 이전 항목 중 확인이 필요한 항목이 있는지 확인
           const hasUnconfirmedPreviousItem = testItems.slice(0, index).some(prevItem => {
             if (!itemsNeedingFeedback.includes(prevItem)) return false
             
             const prevScore = scores[prevItem]
-            if (prevItem === '후속화장품 흡수' || prevItem === '점도') {
-              // 후속화장품 흡수, 점도는 어떤 점수든 확인 필요
+            if (prevItem === '후속화장품 흡수' || prevItem === '점도(육안)') {
+              // 후속화장품 흡수, 점도(육안)는 어떤 점수든 확인 필요
               return prevScore !== undefined && !confirmedItems[prevItem]
             } else {
               // 피막감, 유분감, 제형 안정성은 1점 또는 2점일 때만 확인 필요
@@ -184,7 +184,7 @@ function Step2Form({ onNext, onBack }) {
           const isItemNeedingConfirmation = itemsNeedingFeedback.includes(item)
           const itemScore = scores[item]
           const needsConfirmation = isItemNeedingConfirmation && (
-            (item === '후속화장품 흡수' || item === '점도') ? 
+            (item === '후속화장품 흡수' || item === '점도(육안)') ? 
               itemScore !== undefined && !confirmedItems[item] :
               (itemScore === 1 || itemScore === 2) && !confirmedItems[item]
           )
@@ -279,7 +279,7 @@ function Step2Form({ onNext, onBack }) {
                           const unconfirmedItem = testItems.slice(0, index).find(prevItem => {
                             if (!itemsNeedingFeedback.includes(prevItem)) return false
                             const prevScore = scores[prevItem]
-                            if (prevItem === '후속화장품 흡수' || prevItem === '점도') {
+                            if (prevItem === '후속화장품 흡수' || prevItem === '점도(육안)') {
                               return prevScore !== undefined && !confirmedItems[prevItem]
                             } else {
                               return (prevScore === 1 || prevScore === 2) && !confirmedItems[prevItem]
@@ -317,8 +317,8 @@ function Step2Form({ onNext, onBack }) {
                 </button>
               </div>
             )}
-            {/* 후속화장품 흡수, 점도는 어떤 선택지를 선택하든 텍스트 박스 표시 */}
-            {((item === '후속화장품 흡수' || item === '점도') && scores[item] !== undefined && !confirmedItems[item]) && (
+            {/* 후속화장품 흡수, 점도(육안)는 어떤 선택지를 선택하든 텍스트 박스 표시 */}
+            {((item === '후속화장품 흡수' || item === '점도(육안)') && scores[item] !== undefined && !confirmedItems[item]) && (
               <div className="negative-feedback-box">
                 <textarea
                   className="negative-feedback-input"
@@ -337,7 +337,7 @@ function Step2Form({ onNext, onBack }) {
               </div>
             )}
             {/* 확인 완료 표시 */}
-            {((item === '피막감' || item === '유분감' || item === '제형 안정성' || item === '후속화장품 흡수' || item === '점도') && confirmedItems[item]) && (
+            {((item === '피막감' || item === '유분감' || item === '제형 안정성' || item === '후속화장품 흡수' || item === '점도(육안)') && confirmedItems[item]) && (
               <div className="feedback-confirmed">
                 ✓ 확인 완료
               </div>
