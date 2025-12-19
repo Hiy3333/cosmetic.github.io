@@ -143,9 +143,12 @@ function ItemScoreChart({ testData, itemName, selectedManufacturer, selectedAuth
                   const manufacturerTests = testsByManufacturer[manufacturer]
                   const totalScore = manufacturerTests.reduce((sum, test) => sum + test.score, 0)
                   const averageScore = totalScore / manufacturerTests.length
+                  // 샘플 번호 가져오기 (첫 번째 테스트의 샘플 번호 사용)
+                  const sampleNumber = manufacturerTests[0]?.sampleNumber || ''
                   manufacturerAverages[manufacturer] = {
                     score: averageScore,
-                    count: manufacturerTests.length
+                    count: manufacturerTests.length,
+                    sampleNumber: sampleNumber
                   }
                 })
                 
@@ -174,10 +177,11 @@ function ItemScoreChart({ testData, itemName, selectedManufacturer, selectedAuth
                                       background: color.gradient,
                                       width: `${barWidth}px`
                                     }}
-                                    title={`${manufacturer} 평균: ${avgData.score.toFixed(1)}점 (${avgData.count}회)`}
+                                    title={`${manufacturer} 샘플(${avgData.sampleNumber}) 평균: ${avgData.score.toFixed(1)}점 (${avgData.count}회)`}
                                   >
                                     <span className="item-chart-bar-value">{avgData.score.toFixed(1)}</span>
                                     <span className="item-chart-bar-manufacturer-name">{manufacturer}</span>
+                                    <span className="item-chart-bar-sample-number">샘플({avgData.sampleNumber})</span>
                                   </div>
                                   <div className="item-chart-bar-info">
                                   </div>
